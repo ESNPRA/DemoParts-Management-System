@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEMO零件管理系統</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft JhengHei', Arial, sans-serif; background: #f8fafc; min-height: 100vh; }
+        .container { background: white; width: 100%; min-height: 100vh; display: flex; flex-direction: column; }
+        .header { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 24px; font-weight: 600; }
+        .user-info { display: flex; align-items: center; gap: 15px; font-size: 14px; }
+        .content { padding: 30px; flex: 1; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .nav-buttons { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+        .btn { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease; text-decoration: none; display: inline-block; }
+        .btn-primary { background: #4f46e5; color: white; }
+        .btn-primary:hover { background: #4338ca; transform: translateY(-2px); }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-secondary:hover { background: #4b5563; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; }
+        .login-form { max-width: 400px; margin: 50px auto; padding: 40px; text-align: center; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #374151; }
+        .form-control { width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: border-color 0.3s ease; }
+        .form-control:focus { outline: none; border-color: #4f46e5; }
+        .table-container { overflow-x: auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { padding: 15px; text-align: left; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+        .table th { background: #f9fafb; font-weight: 600; color: #374151; }
+        .table tr:hover { background: #f9fafb; }
+        .status-badge { padding: 4px 8px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-available { background: #dcfce7; color: #166534; }
+        .status-borrowed { background: #fef3c7; color: #92400e; }
+        .search-bar { margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .search-bar input { flex: 1; min-width: 200px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: white; border-radius: 12px; padding: 30px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { color: #374151; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #6b7280; }
+        .close-btn:hover { color: #374151; }
+        .file-upload { position: relative; display: inline-block; width: 100%; }
+        .file-upload input[type=file] { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+        .file-upload-label { display: block; padding: 12px 16px; border: 2px dashed #d1d5db; border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+        .file-upload-label:hover { border-color: #4f46e5; background: #f8fafc; }
+        .image-preview { max-width: 100px; max-height: 100px; border-radius: 8px; border: 1px solid #e5e7eb; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .edit-input { width: 100%; padding: 4px 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 12px; }
+        .admin-controls { display: flex; gap: 5px; align-items: center; }
+        .form-control.error {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+        
+        .error-message {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        @media (max-width: 768px) { .content { padding: 20px; } .nav-buttons { flex-direction: column; } .btn { width: 100%; text-align: center; } .form-row { grid-template-columns: 1fr; } .table th, .table td { padding: 10px; font-size: 12px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header" id="mainHeader" style="display: none;">
+            <h1>DEMO零件管理系統</h1>
+            <div class="user-info">
+                <span id="currentUser">未登入</span>
+                <button class="btn btn-secondary" onclick="logout()">登出</button>
+            </div>
+        </div>
+
+        <div id="loginPage" class="page active">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+                <div class="login-form">
+                    <h2 style="margin-bottom: 30px; color: #374151;">系統登入</h2>
+                    <div class="form-group">
+                        <label for="email">信箱</label>
+                        <input type="email" id="email" class="form-control" placeholder="請輸入信箱">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">密碼</label>
+                        <input type="password" id="password" class="form-control" placeholder="請輸入密碼">
+                    </div>
+                    <button class="btn btn-primary" onclick="login()" style="width: 100%;">登入</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div id="mainPage" class="page">
+                <div class="nav-buttons">
+                    <button class="btn btn-primary" onclick="showPage('searchPage')">查詢既有資料</button>
+                    <button class="btn btn-primary" onclick="showPage('addPartPage')" id="addPartBtn" style="display: none;">資料輸入</button>
+                    <button class="btn btn-primary" onclick="showPage('borrowRecordsPage')" id="borrowRecordsBtn" style="display: none;">借出紀錄</button>
+                    <button class="btn btn-primary" onclick="showPage('userManagementPage')" id="userMgmtBtn" style="display: none;">權限管理</button>
+                </div>
+                <div style="text-align: center; margin-top: 50px;">
+                    <h2 style="color: #374151; margin-bottom: 20px;">歡迎使用DEMO零件管理系統</h2>
+                    <p style="color: #6b7280;">請選擇上方功能開始使用</p>
+                </div>
+            </div>
+
+            <div id="searchPage" class="page">
+                <h2 style="margin-bottom: 20px; color: #374151;">查詢既有資料</h2>
+                <button class="btn btn-secondary" onclick="showPage('mainPage')" style="margin-bottom: 20px;">返回主頁</button>
+                <div class="search-bar">
+                    <input type="text" id="searchInput" class="form-control" placeholder="請輸入型號關鍵字搜尋" oninput="searchParts()">
+                    <select id="sortBy" class="form-control" style="max-width: 200px;" onchange="searchParts()">
+                        <option value="model">依型號排序</option>
+                        <option value="status">依在庫狀態排序</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>型號</th>
+                                <th>在庫數量</th>
+                                <th>在庫狀態</th>
+                                <th>借出區間</th>
+                                <th id="borrowerHeader" style="display: none;">借出人</th>
+                                <th id="contactHeader" style="display: none;">聯絡方式</th>
+                                <th id="descriptionHeader" style="display: none;">需求敘述</th>
+                                <th>照片</th>
+                                <th>借出申請</th>
+                            </tr>
+                        </thead>
+                        <tbody id="partsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="addPartPage" class="page">
+                <h2 style="margin-bottom: 20px; color: #374151;">資料輸入</h2>
+                <button class="btn btn-secondary" onclick="showPage('mainPage')" style="margin-bottom: 20px;">返回主頁</button>
+                <div style="max-width: 800px; margin: 0 auto;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="partModel">型號 *</label>
+                            <input type="text" id="partModel" class="form-control" placeholder="請輸入零件型號">
+                        </div>
+                        <div class="form-group">
+                            <label for="partQuantity">在庫數量 *</label>
+                            <select id="partQuantity" class="form-control"></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="partLocation">零件存放地點 *</label>
+                        <input type="text" id="partLocation" class="form-control" placeholder="請輸入存放地點">
+                    </div>
+                    <div class="form-group">
+                        <label for="partNotes">備註</label>
+                        <textarea id="partNotes" class="form-control" rows="3" placeholder="請輸入備註資訊"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>零件照片 (JPG/JPEG格式)</label>
+                        <div class="file-upload">
+                            <input type="file" id="partImage" accept=".jpg,.jpeg">
+                            <label for="partImage" class="file-upload-label">點擊上傳照片 (JPG/JPEG格式)</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><input type="checkbox" id="partSearchable" checked> 是否能被查詢到</label>
+                    </div>
+                    <button class="btn btn-success" onclick="addPart()" style="width: 100%;">新增零件</button>
+                </div>
+            </div>
+
+            <div id="borrowRecordsPage" class="page">
+                <h2 style="margin-bottom: 20px; color: #374151;">借出紀錄</h2>
+                <button class="btn btn-secondary" onclick="showPage('mainPage')" style="margin-bottom: 20px;">返回主頁</button>
+                <div class="search-bar">
+                    <input type="text" id="recordSearchInput" class="form-control" placeholder="請輸入型號或借出人關鍵字搜尋" oninput="searchBorrowRecords()">
+                    <select id="recordSortBy" class="form-control" style="max-width: 200px;" onchange="searchBorrowRecords()">
+                        <option value="date">依申請日期排序</option>
+                        <option value="model">依型號排序</option>
+                        <option value="borrower">依借出人排序</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="searchBorrowRecords()">搜尋</button>
+                </div>
+                <div style="margin-bottom: 20px; padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                    <strong>統計資訊：</strong>
+                    <span style="margin-left: 20px;">總借出紀錄: <span id="totalRecords">0</span> 筆</span>
+                    <span style="margin-left: 20px;">不同零件種類: <span id="uniqueParts">0</span> 種</span>
+                    <span style="margin-left: 20px;">總借出數量: <span id="totalBorrowedQuantity">0</span> 個</span>
+                </div>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>申請日期</th>
+                                <th>零件型號</th>
+                                <th>借用數量</th>
+                                <th>借出人/單位</th>
+                                <th>聯絡方式</th>
+                                <th>借出區間</th>
+                                <th>借用需求敘述</th>
+                            </tr>
+                        </thead>
+                        <tbody id="borrowRecordsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="userManagementPage" class="page">
+                <h2 style="margin-bottom: 20px; color: #374151;">權限管理</h2>
+                <button class="btn btn-secondary" onclick="showPage('mainPage')" style="margin-bottom: 20px;">返回主頁</button>
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <h3 style="margin-bottom: 20px;">新增帳號</h3>
+                    <div class="form-group">
+                        <label for="newUserEmail">信箱 *</label>
+                        <input type="email" id="newUserEmail" class="form-control" placeholder="請輸入信箱">
+                    </div>
+                    <div class="form-group">
+                        <label for="newUserPassword">密碼 *</label>
+                        <input type="password" id="newUserPassword" class="form-control" placeholder="請輸入密碼">
+                    </div>
+                    <div class="form-group">
+                        <label for="newUserRole">權限 *</label>
+                        <select id="newUserRole" class="form-control">
+                            <option value="user">一般使用者</option>
+                            <option value="admin">管理員</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-success" onclick="addUser()" style="width: 100%; margin-bottom: 30px;">新增帳號</button>
+                </div>
+                <h3 style="margin-bottom: 20px;">管理員帳號信箱</h3>
+                <div id="adminEmails" style="margin-bottom: 30px; padding: 15px; background: #f9fafb; border-radius: 8px;"></div>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr><th>信箱</th><th>權限</th><th>操作</th></tr>
+                        </thead>
+                        <tbody id="usersTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="borrowModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>申請借用</h2>
+                <button class="close-btn" onclick="closeBorrowModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>申請借用型號</label>
+                <input type="text" id="borrowPartModel" class="form-control" readonly>
+            </div>
+            <div class="form-group">
+                <label>可借用數量</label>
+                <input type="text" id="availableQuantity" class="form-control" readonly>
+            </div>
+            <div class="form-group">
+                <label for="borrowQuantity">借用數量 *</label>
+                <select id="borrowQuantity" class="form-control"></select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="borrowerName">借出人 *</label>
+                    <input type="text" id="borrowerName" class="form-control" placeholder="請輸入借出人姓名">
+                    <div class="error-message" id="borrowerNameError">請輸入借出人姓名（至少2個字元）</div>
+                </div>
+                <div class="form-group">
+                    <label for="companyName">單位名稱 *</label>
+                    <input type="text" id="companyName" class="form-control" placeholder="請輸入單位名稱">
+                    <div class="error-message" id="companyNameError">請輸入單位名稱（至少2個字元）</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="borrowerEmail">借出人信箱 *</label>
+                <input type="email" id="borrowerEmail" class="form-control" placeholder="請輸入借出人信箱">
+                <div class="error-message" id="borrowerEmailError">請輸入有效的信箱格式，例如：example@domain.com</div>
+            </div>
+            <div class="form-group">
+                <label for="borrowerPhone">借出人電話 *</label>
+                <input type="tel" id="borrowerPhone" class="form-control" placeholder="請輸入借出人電話">
+                <div class="error-message" id="borrowerPhoneError">請輸入有效的電話號碼（至少9位數字）</div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="borrowStartDate">借用開始日期 *</label>
+                    <input type="date" id="borrowStartDate" class="form-control">
+                    <div class="error-message" id="borrowStartDateError">開始日期不能早於今天</div>
+                </div>
+                <div class="form-group">
+                    <label for="borrowEndDate">實際歸還日期 *</label>
+                    <input type="date" id="borrowEndDate" class="form-control">
+                    <div class="error-message" id="borrowEndDateError">歸還日期必須晚於開始日期且不超過一個月</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="borrowDescription">借用需求敘述 *</label>
+                <textarea id="borrowDescription" class="form-control" rows="3" placeholder="請描述借用需求"></textarea>
+                <div class="error-message" id="borrowDescriptionError">請詳細描述借用需求（至少10個字元）</div>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="closeBorrowModal()">取消</button>
+                <button class="btn btn-success" onclick="submitBorrowRequest()">申請</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color: #10b981;" id="successModalTitle">✅ 操作成功！</h2>
+                <button class="close-btn" onclick="closeSuccessModal()">&times;</button>
+            </div>
+            <div id="successContent" style="margin: 20px 0; line-height: 1.6;"></div>
+            <div style="display: flex; justify-content: center;">
+                <button class="btn btn-success" onclick="closeSuccessModal()">確定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let users = [
+            { email: '11', password: '22', role: 'admin' },
+            { email: 'admin@example.com', password: 'admin123', role: 'admin' },
+            { email: 'user@example.com', password: 'user123', role: 'user' }
+        ];
+        let parts = [];
+        let borrowRecords = [];
+        let currentUser = null;
+        let currentBorrowingPart = null;
+
+        function init() {
+            initQuantityDropdown();
+            setDateConstraints();
+        }
+
+        function initQuantityDropdown() {
+            const quantitySelect = document.getElementById('partQuantity');
+            if (quantitySelect) {
+                quantitySelect.innerHTML = '';
+                for (let i = 1; i <= 100; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = i;
+                    quantitySelect.appendChild(option);
+                }
+            }
+        }
+
+        function setDateConstraints() {
+            const today = new Date().toISOString().split('T')[0];
+            const startDateInput = document.getElementById('borrowStartDate');
+            const endDateInput = document.getElementById('borrowEndDate');
+            
+            if (startDateInput) {
+                startDateInput.min = today;
+                startDateInput.addEventListener('change', function() {
+                    const startDate = new Date(this.value);
+                    const maxEndDate = new Date(startDate);
+                    maxEndDate.setMonth(startDate.getMonth() + 1);
+                    
+                    endDateInput.min = this.value;
+                    endDateInput.max = maxEndDate.toISOString().split('T')[0];
+                    
+                    if (endDateInput.value && new Date(endDateInput.value) > maxEndDate) {
+                        endDateInput.value = maxEndDate.toISOString().split('T')[0];
+                    }
+                });
+            }
+        }
+
+        function getTimestamp() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            return year + '/' + month + '/' + day + ' - ' + hours + ':' + minutes + ':' + seconds;
+        }
+
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            if (!email || !password) {
+                alert('請輸入信箱和密碼');
+                return;
+            }
+            const user = users.find(u => u.email === email && u.password === password);
+            if (user) {
+                currentUser = user;
+                document.getElementById('currentUser').textContent = user.email + ' (' + (user.role === 'admin' ? '管理員' : '一般使用者') + ')';
+                document.getElementById('mainHeader').style.display = 'flex';
+                if (user.role === 'admin') {
+                    document.getElementById('addPartBtn').style.display = 'inline-block';
+                    document.getElementById('borrowRecordsBtn').style.display = 'inline-block';
+                    document.getElementById('userMgmtBtn').style.display = 'inline-block';
+                    document.getElementById('borrowerHeader').style.display = 'table-cell';
+                    document.getElementById('contactHeader').style.display = 'table-cell';
+                    document.getElementById('descriptionHeader').style.display = 'table-cell';
+                }
+                showPage('mainPage');
+            } else {
+                alert('信箱或密碼錯誤');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('currentUser').textContent = '未登入';
+            document.getElementById('mainHeader').style.display = 'none';
+            document.getElementById('addPartBtn').style.display = 'none';
+            document.getElementById('borrowRecordsBtn').style.display = 'none';
+            document.getElementById('userMgmtBtn').style.display = 'none';
+            document.getElementById('borrowerHeader').style.display = 'none';
+            document.getElementById('contactHeader').style.display = 'none';
+            document.getElementById('descriptionHeader').style.display = 'none';
+            showPage('loginPage');
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            if (pageId === 'searchPage') {
+                loadParts();
+            } else if (pageId === 'userManagementPage') {
+                loadUsers();
+                loadAdminEmails();
+            } else if (pageId === 'borrowRecordsPage') {
+                loadBorrowRecords();
+            }
+        }
+
+        function addPart() {
+            const model = document.getElementById('partModel').value.trim();
+            const quantity = parseInt(document.getElementById('partQuantity').value);
+            const location = document.getElementById('partLocation').value.trim();
+            const notes = document.getElementById('partNotes').value.trim();
+            const searchable = document.getElementById('partSearchable').checked;
+            const imageFile = document.getElementById('partImage').files[0];
+
+            if (!model || !location) {
+                alert('請填寫所有必填欄位');
+                return;
+            }
+            if (parts.find(p => p.model === model)) {
+                alert('此型號已存在，請使用不同的型號');
+                return;
+            }
+            if (imageFile && !['image/jpeg', 'image/jpg'].includes(imageFile.type)) {
+                alert('請上傳 JPG 或 JPEG 格式的圖片');
+                return;
+            }
+
+            const newPart = {
+                id: Date.now(),
+                model: model,
+                quantity: quantity,
+                location: location,
+                notes: notes || '',
+                status: '在庫',
+                borrower: 'N/A',
+                borrowerEmail: 'N/A',
+                borrowerPhone: 'N/A',
+                borrowPeriod: 'N/A',
+                description: 'N/A',
+                searchable: searchable,
+                createdAt: getTimestamp(),
+                image: imageFile ? URL.createObjectURL(imageFile) : null
+            };
+
+            parts.push(newPart);
+            showSuccessMessage(model, quantity, location, notes);
+            
+            document.getElementById('partModel').value = '';
+            document.getElementById('partQuantity').value = '1';
+            document.getElementById('partLocation').value = '';
+            document.getElementById('partNotes').value = '';
+            document.getElementById('partSearchable').checked = true;
+            document.getElementById('partImage').value = '';
+            const fileLabel = document.querySelector('.file-upload-label');
+            if (fileLabel) {
+                fileLabel.textContent = '點擊上傳照片 (JPG/JPEG格式)';
+            }
+        }
+
+        function showSuccessMessage(model, quantity, location, notes) {
+            const successContent = document.getElementById('successContent');
+            const successTitle = document.getElementById('successModalTitle');
+            successTitle.textContent = '✅ 零件新增成功！';
+            successContent.innerHTML = '<div style="background: #f0fdf4; padding: 15px; border-radius: 8px; border-left: 4px solid #10b981;"><strong>零件詳細資訊：</strong><br><br><strong>型號：</strong>' + model + '<br><strong>數量：</strong>' + quantity + '<br><strong>存放地點：</strong>' + location + '<br>' + (notes ? '<strong>備註：</strong>' + notes + '<br>' : '') + '<br><span style="color: #10b981; font-weight: 600;">✨ 已經順利新增新的零件。</span></div>';
+            document.getElementById('successModal').classList.add('active');
+        }
+
+        function showBorrowSuccessMessage(model, quantity, startDate, endDate, borrowerName) {
+            const successContent = document.getElementById('successContent');
+            const successTitle = document.getElementById('successModalTitle');
+            successTitle.textContent = '🎉 借用申請成功！';
+            successContent.innerHTML = '<div style="background: #f0fdf4; padding: 15px; border-radius: 8px; border-left: 4px solid #10b981;"><strong>申請詳細資訊：</strong><br><br><strong>零件型號：</strong>' + model + '<br><strong>借用數量：</strong>' + quantity + ' 個<br><strong>借出區間：</strong>' + startDate + ' 至 ' + endDate + '<br><strong>借出人/單位：</strong>' + borrowerName + '<br><br><span style="color: #10b981; font-weight: 600;">✨ 系統已自動發送確認郵件給申請人和管理員。</span></div>';
+            document.getElementById('successModal').classList.add('active');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('active');
+        }
+
+        function loadParts() {
+            const tbody = document.getElementById('partsTableBody');
+            tbody.innerHTML = '';
+            const searchTerm = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase() : '';
+            const sortBy = document.getElementById('sortBy') ? document.getElementById('sortBy').value : 'model';
+            let filteredParts = parts.filter(part => part.searchable && part.model.toLowerCase().includes(searchTerm));
+            filteredParts.sort((a, b) => {
+                if (sortBy === 'model') return a.model.localeCompare(b.model);
+                if (sortBy === 'status') return a.status.localeCompare(b.status);
+                return 0;
+            });
+            filteredParts.forEach(part => {
+                const row = document.createElement('tr');
+                let borrowPeriodDisplay = 'N/A';
+                if (part.status === '已借出') {
+                    const partRecords = borrowRecords.filter(r => r.partId === part.id);
+                    if (partRecords.length > 0) {
+                        borrowPeriodDisplay = '<div class="borrow-records">';
+                        partRecords.forEach(record => {
+                            borrowPeriodDisplay += '<div style="padding: 5px 0; border-bottom: 1px solid #f3f4f6;">申請日期: ' + record.applicationDate + '<br>借用數量: ' + record.quantity + '<br>借出區間: ' + record.startDate + ' 至 ' + record.endDate + '</div>';
+                        });
+                        borrowPeriodDisplay += '</div>';
+                    } else {
+                        borrowPeriodDisplay = part.borrowPeriod;
+                    }
+                }
+                let actionCell = '';
+                if (part.status === '在庫' && part.quantity > 0) {
+                    actionCell = '<button class="btn btn-primary" onclick="openBorrowModal(' + part.id + ')">申請借用</button>';
+                } else {
+                    actionCell = '<span style="color: #6b7280;">無法申請</span>';
+                }
+                const imageCell = part.image ? '<img src="' + part.image + '" class="image-preview" alt="零件照片">' : '<span style="color: #6b7280;">無照片</span>';
+                let quantityCell = part.quantity.toString();
+                let statusCell = '<span class="status-badge ' + (part.status === '在庫' ? 'status-available' : 'status-borrowed') + '">' + part.status + '</span>';
+                if (currentUser && currentUser.role === 'admin') {
+                    quantityCell = '<div class="admin-controls"><input type="number" class="edit-input" value="' + part.quantity + '" min="0" onchange="updatePartQuantity(' + part.id + ', this.value)" style="width: 60px;"></div>';
+                    statusCell = '<select class="edit-input" onchange="updatePartStatus(' + part.id + ', this.value)"><option value="在庫"' + (part.status === '在庫' ? ' selected' : '') + '>在庫</option><option value="已借出"' + (part.status === '已借出' ? ' selected' : '') + '>已借出</option></select>';
+                }
+                const adminCells = currentUser && currentUser.role === 'admin' ? '<td>' + part.borrower + '</td><td>' + part.borrowerEmail + '<br>' + part.borrowerPhone + '</td><td>' + part.description + '</td>' : '';
+                row.innerHTML = '<td>' + part.model + '</td><td>' + quantityCell + '</td><td>' + statusCell + '</td><td>' + borrowPeriodDisplay + '</td>' + adminCells + '<td>' + imageCell + '</td><td>' + actionCell + '</td>';
+                tbody.appendChild(row);
+            });
+        }
+
+        function updatePartQuantity(partId, newQuantity) {
+            const part = parts.find(p => p.id === partId);
+            if (part) {
+                const quantity = parseInt(newQuantity) || 0;
+                part.quantity = quantity;
+                if (quantity > 0) {
+                    part.status = '在庫';
+                } else {
+                    part.status = '已借出';
+                }
+                loadParts();
+                alert('零件 ' + part.model + ' 數量已更新為 ' + quantity);
+            }
+        }
+
+        function updatePartStatus(partId, newStatus) {
+            const part = parts.find(p => p.id === partId);
+            if (part) {
+                part.status = newStatus;
+                loadParts();
+                alert('零件 ' + part.model + ' 狀態已更新為 ' + newStatus);
+            }
+        }
+
+        function searchParts() {
+            loadParts();
+        }
+
+        function openBorrowModal(partId) {
+            const part = parts.find(p => p.id === partId);
+            if (!part || part.status !== '在庫' || part.quantity <= 0) {
+                alert('此零件無法借用');
+                return;
+            }
+            currentBorrowingPart = part;
+            document.getElementById('borrowPartModel').value = part.model;
+            document.getElementById('availableQuantity').value = part.quantity;
+            
+            const quantitySelect = document.getElementById('borrowQuantity');
+            quantitySelect.innerHTML = '';
+            for (let i = 1; i <= part.quantity; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i + ' 個';
+                quantitySelect.appendChild(option);
+            }
+            
+            const today = new Date();
+            const nextMonth = new Date(today);
+            nextMonth.setMonth(today.getMonth() + 1);
+            document.getElementById('borrowStartDate').value = today.toISOString().split('T')[0];
+            document.getElementById('borrowEndDate').value = nextMonth.toISOString().split('T')[0];
+            document.getElementById('borrowModal').classList.add('active');
+        }
+
+        function closeBorrowModal() {
+            document.getElementById('borrowModal').classList.remove('active');
+            currentBorrowingPart = null;
+            
+            // 清空表單
+            document.getElementById('borrowerName').value = '';
+            document.getElementById('companyName').value = '';
+            document.getElementById('borrowerEmail').value = '';
+            document.getElementById('borrowerPhone').value = '';
+            document.getElementById('borrowDescription').value = '';
+            
+            // 清除錯誤提示
+            clearBorrowFormErrors();
+        }
+
+        function clearBorrowFormErrors() {
+            const errorElements = document.querySelectorAll('#borrowModal .error-message');
+            const inputElements = document.querySelectorAll('#borrowModal .form-control');
+            
+            errorElements.forEach(element => {
+                element.classList.remove('show');
+            });
+            
+            inputElements.forEach(element => {
+                element.classList.remove('error');
+            });
+        }
+
+        function showFieldError(fieldId, errorId) {
+            document.getElementById(fieldId).classList.add('error');
+            document.getElementById(errorId).classList.add('show');
+        }
+
+        function submitBorrowRequest() {
+            if (!currentBorrowingPart) return;
+            
+            // 清除之前的錯誤提示
+            clearBorrowFormErrors();
+            
+            const borrowerName = document.getElementById('borrowerName').value.trim();
+            const companyName = document.getElementById('companyName').value.trim();
+            const borrowerEmail = document.getElementById('borrowerEmail').value.trim();
+            const borrowerPhone = document.getElementById('borrowerPhone').value.trim();
+            const borrowQuantity = parseInt(document.getElementById('borrowQuantity').value);
+            const startDate = document.getElementById('borrowStartDate').value;
+            const endDate = document.getElementById('borrowEndDate').value;
+            const description = document.getElementById('borrowDescription').value.trim();
+            
+            let hasErrors = false;
+            let errorMessage = '請修正以下欄位：\n\n';
+            
+            // 驗證借出人姓名
+            if (!borrowerName || borrowerName.length < 2) {
+                showFieldError('borrowerName', 'borrowerNameError');
+                errorMessage += '• 借出人姓名：請輸入至少2個字元的姓名\n';
+                hasErrors = true;
+            }
+            
+            // 驗證單位名稱
+            if (!companyName || companyName.length < 2) {
+                showFieldError('companyName', 'companyNameError');
+                errorMessage += '• 單位名稱：請輸入至少2個字元的單位名稱\n';
+                hasErrors = true;
+            }
+            
+            // 驗證信箱格式
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!borrowerEmail || !emailRegex.test(borrowerEmail)) {
+                showFieldError('borrowerEmail', 'borrowerEmailError');
+                errorMessage += '• 借出人信箱：請輸入有效的信箱格式，例如：example@domain.com\n';
+                hasErrors = true;
+            }
+            
+            // 驗證電話號碼
+            const phoneRegex = /^\d{9,}$/;
+            if (!borrowerPhone || !phoneRegex.test(borrowerPhone.replace(/[\s\-\(\)]/g, ''))) {
+                showFieldError('borrowerPhone', 'borrowerPhoneError');
+                errorMessage += '• 借出人電話：請輸入有效的電話號碼（至少9位數字）\n';
+                hasErrors = true;
+            }
+            
+            // 驗證日期
+            if (!startDate) {
+                showFieldError('borrowStartDate', 'borrowStartDateError');
+                errorMessage += '• 借用開始日期：請選擇開始日期\n';
+                hasErrors = true;
+            } else {
+                const start = new Date(startDate);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                if (start < today) {
+                    showFieldError('borrowStartDate', 'borrowStartDateError');
+                    errorMessage += '• 借用開始日期：開始日期不能早於今天\n';
+                    hasErrors = true;
+                }
+            }
+            
+            if (!endDate) {
+                showFieldError('borrowEndDate', 'borrowEndDateError');
+                errorMessage += '• 實際歸還日期：請選擇歸還日期\n';
+                hasErrors = true;
+            } else if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                
+                if (end <= start) {
+                    showFieldError('borrowEndDate', 'borrowEndDateError');
+                    errorMessage += '• 實際歸還日期：歸還日期必須晚於開始日期\n';
+                    hasErrors = true;
+                } else {
+                    // 檢查是否超過一個月
+                    const oneMonthLater = new Date(start);
+                    oneMonthLater.setMonth(start.getMonth() + 1);
+                    if (end > oneMonthLater) {
+                        showFieldError('borrowEndDate', 'borrowEndDateError');
+                        errorMessage += '• 實際歸還日期：借用期限不能超過一個月\n';
+                        hasErrors = true;
+                    }
+                }
+            }
+            
+            // 驗證借用需求敘述
+            if (!description || description.length < 10) {
+                showFieldError('borrowDescription', 'borrowDescriptionError');
+                errorMessage += '• 借用需求敘述：請詳細描述借用需求（至少10個字元）\n';
+                hasErrors = true;
+            }
+            
+            // 如果有錯誤，顯示提示訊息並停止提交
+            if (hasErrors) {
+                alert(errorMessage);
+                return;
+            }
+            
+            // 如果所有驗證都通過，繼續原有的提交邏輯
+            const applicationTime = getTimestamp();
+            const borrowerFullName = borrowerName + '/' + companyName;
+            const borrowRecord = {
+                id: Date.now(),
+                partId: currentBorrowingPart.id,
+                partModel: currentBorrowingPart.model,
+                quantity: borrowQuantity,
+                borrowerName: borrowerFullName,
+                borrowerEmail: borrowerEmail,
+                borrowerPhone: borrowerPhone,
+                startDate: startDate,
+                endDate: endDate,
+                description: description,
+                applicationDate: applicationTime
+            };
+            borrowRecords.push(borrowRecord);
+            currentBorrowingPart.quantity = currentBorrowingPart.quantity - borrowQuantity;
+            if (currentBorrowingPart.quantity > 0) {
+                currentBorrowingPart.status = '在庫';
+            } else {
+                currentBorrowingPart.status = '已借出';
+            }
+            currentBorrowingPart.borrower = borrowerFullName;
+            currentBorrowingPart.borrowerEmail = borrowerEmail;
+            currentBorrowingPart.borrowerPhone = borrowerPhone;
+            currentBorrowingPart.borrowPeriod = startDate + ' 至 ' + endDate;
+            currentBorrowingPart.description = description;
+            
+            showBorrowSuccessMessage(currentBorrowingPart.model, borrowQuantity, startDate, endDate, borrowerFullName);
+            loadParts();
+            closeBorrowModal();
+        }
+
+        function loadBorrowRecords() {
+            const tbody = document.getElementById('borrowRecordsTableBody');
+            tbody.innerHTML = '';
+            
+            const searchTerm = document.getElementById('recordSearchInput') ? document.getElementById('recordSearchInput').value.toLowerCase() : '';
+            const sortBy = document.getElementById('recordSortBy') ? document.getElementById('recordSortBy').value : 'date';
+            
+            let filteredRecords = borrowRecords.filter(record => 
+                record.partModel.toLowerCase().includes(searchTerm) || 
+                record.borrowerName.toLowerCase().includes(searchTerm)
+            );
+            
+            filteredRecords.sort((a, b) => {
+                if (sortBy === 'date') {
+                    return new Date(b.applicationDate) - new Date(a.applicationDate);
+                } else if (sortBy === 'model') {
+                    return a.partModel.localeCompare(b.partModel);
+                } else if (sortBy === 'borrower') {
+                    return a.borrowerName.localeCompare(b.borrowerName);
+                }
+                return 0;
+            });
+            
+            filteredRecords.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td>' + record.applicationDate + '</td>' +
+                               '<td>' + record.partModel + '</td>' +
+                               '<td>' + record.quantity + '</td>' +
+                               '<td>' + record.borrowerName + '</td>' +
+                               '<td>' + record.borrowerEmail + '<br>' + record.borrowerPhone + '</td>' +
+                               '<td>' + record.startDate + ' 至 ' + record.endDate + '</td>' +
+                               '<td>' + record.description + '</td>';
+                tbody.appendChild(row);
+            });
+            
+            updateBorrowRecordsStats();
+        }
+        
+        function updateBorrowRecordsStats() {
+            const totalRecords = borrowRecords.length;
+            const uniquePartModels = new Set(borrowRecords.map(record => record.partModel)).size;
+            const totalBorrowedQuantity = borrowRecords.reduce((sum, record) => sum + record.quantity, 0);
+            
+            document.getElementById('totalRecords').textContent = totalRecords;
+            document.getElementById('uniqueParts').textContent = uniquePartModels;
+            document.getElementById('totalBorrowedQuantity').textContent = totalBorrowedQuantity;
+        }
+        
+        function searchBorrowRecords() {
+            loadBorrowRecords();
+        }
+
+        function loadUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td>' + user.email + '</td><td><span class="status-badge ' + (user.role === 'admin' ? 'status-borrowed' : 'status-available') + '">' + (user.role === 'admin' ? '管理員' : '一般使用者') + '</span></td><td><select onchange="changeUserRole(\'' + user.email + '\', this.value)" class="form-control" style="width: auto; display: inline-block; margin-right: 10px;"><option value="user"' + (user.role === 'user' ? ' selected' : '') + '>一般使用者</option><option value="admin"' + (user.role === 'admin' ? ' selected' : '') + '>管理員</option></select><button class="btn btn-warning" onclick="alert(\'修改密碼功能\')" style="margin-right: 10px;">修改密碼</button><button class="btn btn-danger" onclick="deleteUser(\'' + user.email + '\')"' + (user.email === (currentUser ? currentUser.email : '') ? ' disabled' : '') + '>刪除帳號</button></td>';
+                tbody.appendChild(row);
+            });
+        }
+
+        function loadAdminEmails() {
+            const adminEmailsDiv = document.getElementById('adminEmails');
+            const adminEmails = users.filter(u => u.role === 'admin').map(u => u.email);
+            if (adminEmails.length > 0) {
+                adminEmailsDiv.innerHTML = '<strong>目前管理員信箱：</strong><br>' + adminEmails.join('<br>');
+            } else {
+                adminEmailsDiv.innerHTML = '<strong>目前無管理員帳號</strong>';
+            }
+        }
+
+        function addUser() {
+            const email = document.getElementById('newUserEmail').value.trim();
+            const password = document.getElementById('newUserPassword').value.trim();
+            const role = document.getElementById('newUserRole').value;
+            if (!email || !password) {
+                alert('請填寫所有必填欄位');
+                return;
+            }
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('請輸入有效的信箱格式');
+                return;
+            }
+            if (users.find(u => u.email === email)) {
+                alert('此信箱已註冊');
+                return;
+            }
+            users.push({ email: email, password: password, role: role });
+            alert('使用者新增成功！');
+            document.getElementById('newUserEmail').value = '';
+            document.getElementById('newUserPassword').value = '';
+            document.getElementById('newUserRole').value = 'user';
+            loadUsers();
+            loadAdminEmails();
+        }
+
+        function deleteUser(email) {
+            if (email === (currentUser ? currentUser.email : '')) {
+                alert('無法刪除當前登入的使用者');
+                return;
+            }
+            if (confirm('確定要刪除使用者 ' + email + ' 嗎？')) {
+                users = users.filter(u => u.email !== email);
+                loadUsers();
+                loadAdminEmails();
+                alert('使用者已刪除');
+            }
+        }
+
+        function changeUserRole(email, newRole) {
+            const user = users.find(u => u.email === email);
+            if (user) {
+                user.role = newRole;
+                alert('使用者 ' + email + ' 的權限已更新為 ' + (newRole === 'admin' ? '管理員' : '一般使用者'));
+                loadUsers();
+                loadAdminEmails();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('partImage');
+            if (fileInput) {
+                fileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    const label = document.querySelector('.file-upload-label');
+                    if (file) {
+                        if (['image/jpeg', 'image/jpg'].includes(file.type)) {
+                            label.textContent = '已選擇: ' + file.name;
+                            label.style.color = '#10b981';
+                        } else {
+                            label.textContent = '請選擇 JPG 或 JPEG 格式的圖片';
+                            label.style.color = '#ef4444';
+                            e.target.value = '';
+                        }
+                    } else {
+                        label.textContent = '點擊上傳照片 (JPG/JPEG格式)';
+                        label.style.color = '#374151';
+                    }
+                });
+            }
+            init();
+        });
+    </script>
+</body>
+</html> + '
