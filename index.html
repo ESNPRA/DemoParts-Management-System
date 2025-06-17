@@ -409,6 +409,7 @@
                             <th>Email</th>
                             <th>電話</th>
                             <th>角色</th>
+                            <th>狀態</th>
                             <th>修改密碼</th>
                             <th>操作</th>
                         </tr>
@@ -1858,13 +1859,23 @@
 
         // 使用者管理
         function loadUsers() {
+            console.log('loadUsers called');
             const tbody = document.getElementById('usersTableBody');
-            if (!tbody) return;
+            if (!tbody) {
+                console.log('usersTableBody not found');
+                return;
+            }
             
             tbody.innerHTML = '';
 
             users.forEach(user => {
                 const row = document.createElement('tr');
+                
+                // 如果帳號被停用，整行顯示為灰色
+                if (user.isActive === false) {
+                    row.style.opacity = '0.6';
+                    row.style.backgroundColor = '#f3f4f6';
+                }
                 
                 let roleDisplay = '';
                 switch(user.role) {
@@ -1874,16 +1885,34 @@
                     default: roleDisplay = '使用者';
                 }
                 
+                // 狀態顯示
+                let statusCell = '';
+                if (user.isActive === true || user.isActive === undefined) {
+                    statusCell = '<span style="color: #10b981; font-weight: 500;">✓ 啟用</span>';
+                } else {
+                    statusCell = '<span style="color: #ef4444; font-weight: 500;">✗ 停用</span>';
+                }
+                
                 let actionCell = '';
                 let passwordCell = '<button class="btn btn-secondary" onclick="openPasswordModal(\'' + user.email + '\')" style="padding: 8px 16px; font-size: 14px;">修改密碼</button>';
                 
                 if (user.email !== currentUser.email) {
+                    // 角色選擇
                     actionCell = '<select onchange="updateUserRole(\'' + user.email + '\', this.value)" style="margin-right: 10px;">' +
                                '<option value="admin"' + (user.role === 'admin' ? ' selected' : '') + '>管理員</option>' +
                                '<option value="ra_staff"' + (user.role === 'ra_staff' ? ' selected' : '') + '>RA同仁</option>' +
                                '<option value="demo_user"' + (user.role === 'demo_user' ? ' selected' : '') + '>DEMO借用者</option>' +
-                               '</select>' +
-                               '<button class="btn btn-danger" onclick="deleteUser(\'' + user.email + '\')" style="padding: 8px 16px; font-size: 14px;">刪除</button>';
+                               '</select>';
+                    
+                    // 啟用/停用按鈕
+                    if (user.isActive === true || user.isActive === undefined) {
+                        actionCell += '<button class="btn" style="background-color: #ef4444; color: white; padding: 8px 16px; font-size: 14px; margin-right: 10px;" onclick="toggleUserStatus(\'' + user.email + '\')">停用</button>';
+                    } else {
+                        actionCell += '<button class="btn" style="background-color: #10b981; color: white; padding: 8px 16px; font-size: 14px; margin-right: 10px;" onclick="toggleUserStatus(\'' + user.email + '\')">啟用</button>';
+                    }
+                    
+                    // 刪除按鈕
+                    actionCell += '<button class="btn btn-danger" onclick="deleteUser(\'' + user.email + '\')" style="padding: 8px 16px; font-size: 14px;">刪除</button>';
                 } else {
                     actionCell = '<span style="color: #6b7280;">目前使用者</span>';
                 }
@@ -1892,9 +1921,42 @@
                 const userName = user.name || user.email.split('@')[0];
                 const userPhone = user.phone || '-';
                 
-                row.innerHTML = '<td>' + userName + '</td><td>' + user.email + '</td><td>' + userPhone + '</td><td>' + roleDisplay + '</td><td>' + passwordCell + '</td><td>' + actionCell + '</td>';
+                row.innerHTML = '<td>' + userName + '</td><td>' + user.email + '</td><td>' + userPhone + '</td><td>' + roleDisplay + '</td><td>' + statusCell + '</td><td>' + passwordCell + '</td><td>' + actionCell + '</td>';
                 tbody.appendChild(row);
             });
+            
+            console.log('Users loaded:', users.length);
+        }
+        
+        // 確保函數在全域範圍內可用
+        window.loadUsers = loadUsers;
+
+        // 切換使用者狀態（啟用/停用）
+        function toggleUserStatus(email) {
+            const user = users.find(u => u.email === email);
+            if (!user) return;
+            
+            // 檢查是否為最後一個啟用的管理員
+            const activeAdmins = users.filter(u => u.role === 'admin' && (u.isActive === true || u.isActive === undefined));
+            if (user.role === 'admin' && (user.isActive === true || user.isActive === undefined) && activeAdmins.length === 1) {
+                alert('❌ 無法停用最後一個管理員帳號！');
+                return;
+            }
+            
+            // 切換狀態
+            if (user.isActive === true || user.isActive === undefined) {
+                if (confirm('確定要停用此帳號嗎？\n\n帳號：' + email + '\n停用後該使用者將無法登入系統。')) {
+                    user.isActive = false;
+                    alert('✅ 帳號已停用');
+                    loadUsers();
+                }
+            } else {
+                if (confirm('確定要啟用此帳號嗎？\n\n帳號：' + email + '\n啟用後該使用者可以正常登入系統。')) {
+                    user.isActive = true;
+                    alert('✅ 帳號已啟用');
+                    loadUsers();
+                }
+            }
         }
 
         function updateUserRole(email, newRole) {
@@ -2129,7 +2191,8 @@
                 email: email,
                 phone: phone,
                 password: password,
-                role: role
+                role: role,
+                isActive: true
             };
 
             users.push(newUser);
