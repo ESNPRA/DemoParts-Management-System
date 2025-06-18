@@ -2178,11 +2178,27 @@
                 
                 let typeCell, statusCell, actionCell;
                 
+                // 根據 partId 找到對應的零件資料
+                const part = parts.find(p => p.id === record.partId);
+                
+                // 判斷當前使用者是否有權限操作
+                let hasPermission = false;
+                if (currentUser) {
+                    if (currentUser.role === 'admin') {
+                        // 管理員有完整權限
+                        hasPermission = true;
+                    } else if (currentUser.role === 'ra_staff' && part) {
+                        // RA同仁只能操作自己建立的零件
+                        hasPermission = part.createdBy === currentUser.email;
+                    }
+                    // DEMO借用者沒有任何操作權限
+                }
+                
                 if (record.type === 'borrow') {
                     typeCell = '<span class="status-badge" style="background: #10b981; color: white;">借出</span>';
                     statusCell = '<span class="status-badge ' + (record.status === '借出中' ? 'status-borrowed' : 'status-available') + '">' + record.status + '</span>';
                     
-                    if (record.status === '借出中' && (currentUser.role === 'admin' || currentUser.role === 'ra_staff')) {
+                    if (record.status === '借出中' && hasPermission) {
                         actionCell = '<button class="btn btn-success" onclick="returnPart(' + record.id + ')">確認歸還</button>';
                     } else {
                         actionCell = '<span style="color: #6b7280;">-</span>';
@@ -2191,7 +2207,7 @@
                     typeCell = '<span class="status-badge" style="background: #3b82f6; color: white;">預約</span>';
                     statusCell = '<span class="status-badge" style="background: #10b981; color: white;">已確認</span>';
                     
-                    if (record.status === RESERVATION_STATUS.CONFIRMED && (currentUser.role === 'admin' || currentUser.role === 'ra_staff')) {
+                    if (record.status === RESERVATION_STATUS.CONFIRMED && hasPermission) {
                         actionCell = '<button class="btn btn-danger" onclick="cancelReservation(' + record.id + ')">取消預約</button>';
                     } else {
                         actionCell = '<span style="color: #6b7280;">-</span>';
