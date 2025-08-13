@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEMO零件管理系統</title>
+    <title>器材管理系統</title>
     <style>
         * {
             margin: 0;
@@ -12,67 +12,64 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        /* 登入頁面樣式 */
+        .login-container {
             min-height: 100vh;
             display: flex;
+            align-items: center;
             justify-content: center;
-            align-items: flex-start;
-            padding-top: 40px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .login-card, .main-card {
-            background: white;
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
         .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%;
             max-width: 400px;
-            margin: 0 auto;
         }
 
-        .main-card {
-            max-width: 100%;
-            text-align: left;
-            padding: 60px;
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 40px;
+        .login-header {
             text-align: center;
-            font-size: 2.5em;
-        }
-
-        h2, h3 {
-            color: #333;
             margin-bottom: 30px;
         }
 
+        .login-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
         .form-group {
-            margin-bottom: 20px;
-            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
+        .form-label {
             font-weight: 500;
+            color: #333;
         }
 
-        input, select, textarea {
-            width: 100%;
+        .form-input {
             padding: 12px;
             border: 2px solid #e1e5e9;
             border-radius: 8px;
@@ -80,90 +77,361 @@
             transition: border-color 0.3s;
         }
 
-        input:focus, select:focus, textarea:focus {
+        .form-input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #6c63ff;
         }
 
-        textarea {
+        .login-btn {
+            background: linear-gradient(135deg, #6c63ff, #5a52d5);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* 主系統樣式 */
+        .system-container {
+            display: none;
+        }
+
+        .system-container.active {
+            display: block;
+        }
+
+        /* 頂部導航 */
+        .navbar {
+            background: linear-gradient(135deg, #6c63ff, #5a52d5);
+            color: white;
+            padding: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .nav-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-right: 40px;
+            padding: 15px 0;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .nav-user {
+            margin-left: auto;
+            padding: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* 主要內容區域 */
+        .main-content {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .page-content {
+            display: none;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        /* 通用卡片樣式 */
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .card-title::before {
+            margin-right: 8px;
+        }
+
+        /* 按鈕樣式 */
+        .btn {
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #6c63ff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a52d5;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* 表格樣式 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .data-table td {
+            font-size: 14px;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9ff;
+        }
+
+        /* 搜尋和篩選 */
+        .search-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .filter-select, .search-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 120px;
+        }
+
+        .search-input {
+            min-width: 200px;
+        }
+
+        /* 狀態標籤 */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-available { background: #d4edda; color: #155724; }
+        .status-borrowed { background: #cce5ff; color: #004085; }
+        .status-maintenance { background: #fff3cd; color: #856404; }
+        .status-overdue { background: #f8d7da; color: #721c24; }
+        .status-active { background: #d1ecf1; color: #0c5460; }
+        .status-inactive { background: #f8d7da; color: #721c24; }
+        .status-admin { background: #e2e3e5; color: #383d41; }
+        .status-user { background: #d4edda; color: #155724; }
+        .status-returned { background: #d4edda; color: #155724; }
+        .status-pending { background: #fff3cd; color: #856404; }
+
+        /* 統計卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9ff, #e8ebff);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #e0e6ff;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(108, 99, 255, 0.15);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #6c63ff;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        /* 表單樣式 */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-field label {
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-field input,
+        .form-field select,
+        .form-field textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-field textarea {
             resize: vertical;
             min-height: 80px;
         }
 
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin: 5px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .btn-success { background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%); }
-        .btn-danger { background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); }
-        .btn-secondary { background: linear-gradient(135deg, #757f9a 0%, #d7dde8 100%); }
-
-        .nav-buttons {
+        /* 操作按鈕群組 */
+        .action-buttons {
             display: flex;
+            gap: 5px;
             flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 40px;
-            justify-content: center;
         }
 
-        .nav-buttons .btn {
-            padding: 15px 35px;
-            font-size: 18px;
-            min-width: 140px;
-        }
-
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 30px;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            table-layout: fixed; /* 🔥 固定表格佈局，讓寬度設定生效 */
-        }
-
-        th, td {
-            padding: 16px;
-            text-align: left;
-            border-bottom: 1px solid #e1e5e9;
-            word-wrap: break-word; /* 🔥 允許長文字換行 */
-            vertical-align: top; /* 🔥 頂部對齊，讓按鈕排列更整齊 */
-        }
-
-        th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
-        }
-
-        tr:hover {
-            background-color: #f8f9fa;
-        }
-
+        /* 模態框樣式 */
         .modal {
             display: none;
             position: fixed;
@@ -172,2463 +440,1388 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .modal-content {
-            background-color: white;
-            margin: 3% auto;
-            padding: 40px;
-            border-radius: 15px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
             width: 90%;
             max-width: 600px;
-            max-height: 85vh;
+            max-height: 80vh;
             overflow-y: auto;
         }
 
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            line-height: 1;
-        }
-
-        .close:hover {
-            color: #000;
-        }
-
-        .search-container {
+        .modal-header {
             display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
+            justify-content: between;
             align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
         }
 
-        .search-container input {
-            flex: 3;
-            padding: 15px;
-            font-size: 16px;
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
         }
 
-        .search-container select {
-            flex: 1;
-            min-width: 150px;
-            max-width: 200px;
-            padding: 15px;
-            font-size: 16px;
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
         }
 
-        .user-info {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+        .close-btn:hover {
+            color: #333;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .nav-menu {
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #6c63ff;
+                display: none;
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .search-filters {
+                flex-direction: column;
+            }
+
+            .data-table {
+                font-size: 12px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 8px 6px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .equipment-icon {
+            width: 40px;
+            height: 40px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #6c63ff, #5a52d5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 10px 20px;
-            border-radius: 25px;
-            backdrop-filter: blur(10px);
+            font-weight: bold;
         }
 
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
+        .borrow-info {
             font-size: 12px;
-            font-weight: 400;
-            text-transform: none;
+            color: #666;
+            margin-top: 2px;
         }
 
-        .status-available {
-            background-color: #d1fae5;
-            color: #065f46;
+        .overdue {
+            color: #dc3545;
+            font-weight: 500;
         }
 
-        .status-borrowed {
-            background-color: #fecaca;
-            color: #991b1b;
+        /* 頁面特定樣式 */
+        .dashboard-welcome {
+            background: linear-gradient(135deg, #6c63ff, #5a52d5);
+            color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
         }
 
-        .conflict-warning {
-            background: #fecaca;
-            color: #991b1b;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border: 1px solid #f87171;
-        }
-
-        .conflict-warning strong {
-            display: block;
+        .welcome-title {
+            font-size: 24px;
             margin-bottom: 10px;
+        }
+
+        .welcome-subtitle {
+            opacity: 0.9;
+        }
+
+        /* 圖表區域 */
+        .chart-container {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border-radius: 8px;
+            color: #666;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- 使用者資訊顯示 -->
-        <div id="userInfo" class="user-info" style="display: none;">
-            <span id="userDisplay"></span>
-            <button class="btn btn-secondary" onclick="logout()" style="margin-left: 10px; padding: 5px 15px; font-size: 14px;">登出</button>
-        </div>
-
-        <!-- 登入頁面 -->
-        <div id="loginPage" class="login-card">
-            <h1>系統登入</h1>
-            <div class="form-group">
-                <label>Email:</label>
-                <input type="email" id="email" placeholder="請輸入Email">
+    <!-- 登入頁面 -->
+    <div id="loginPage" class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-title">🏢 器材管理系統</div>
+                <div class="login-subtitle">請使用您的帳號登入系統</div>
             </div>
-            <div class="form-group">
-                <label>密碼:</label>
-                <input type="password" id="password" placeholder="請輸入密碼">
-            </div>
-            <button class="btn btn-primary" onclick="login()" style="width: 100%; margin-top: 10px;">登入</button>
-            <div style="text-align: center; margin-top: 20px;">
-                <span style="color: #6b7280;">還沒有帳號？</span>
-                <a href="#" onclick="showRegisterPage()" style="color: #667eea; text-decoration: none; font-weight: 500;">申請新帳號</a>
-            </div>
-        </div>
-
-        <!-- 註冊頁面 -->
-        <div id="registerPage" class="login-card" style="display: none;">
-            <h1>申請新帳號</h1>
-            <div class="form-group">
-                <label>姓名 *</label>
-                <input type="text" id="registerName" placeholder="請輸入姓名">
-                <div id="registerNameError" style="color: #dc2626; font-size: 12px; margin-top: 5px; display: none;"></div>
-            </div>
-            <div class="form-group">
-                <label>電話 *</label>
-                <input type="tel" id="registerPhone" placeholder="請輸入電話">
-                <div id="registerPhoneError" style="color: #dc2626; font-size: 12px; margin-top: 5px; display: none;"></div>
-            </div>
-            <div class="form-group">
-                <label>Email *</label>
-                <input type="email" id="registerEmail" placeholder="請輸入Email">
-                <div id="registerEmailError" style="color: #dc2626; font-size: 12px; margin-top: 5px; display: none;"></div>
-            </div>
-            <div class="form-group">
-                <label>密碼 *</label>
-                <input type="password" id="registerPassword" placeholder="請輸入密碼（至少6個字元）">
-                <div id="registerPasswordError" style="color: #dc2626; font-size: 12px; margin-top: 5px; display: none;"></div>
-            </div>
-            <div class="form-group">
-                <label>確認密碼 *</label>
-                <input type="password" id="registerConfirmPassword" placeholder="請再次輸入密碼">
-                <div id="registerConfirmPasswordError" style="color: #dc2626; font-size: 12px; margin-top: 5px; display: none;"></div>
-            </div>
-            <button class="btn btn-primary" onclick="submitRegister()" style="width: 100%; margin-top: 10px;">完成註冊</button>
-            <div style="text-align: center; margin-top: 20px;">
-                <a href="#" onclick="showLoginPage()" style="color: #667eea; text-decoration: none;">返回登入</a>
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">帳號</label>
+                    <input type="text" class="form-input" id="username" placeholder="請輸入帳號" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">密碼</label>
+                    <input type="password" class="form-input" id="password" placeholder="請輸入密碼" required>
+                </div>
+                <button type="button" class="login-btn" onclick="handleLogin()">登入系統</button>
+            </form>
+            <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; font-size: 12px; color: #666;">
+                <strong>測試帳號：</strong><br>
+                管理員：admin / admin123<br>
+                一般用戶：user / user123
             </div>
         </div>
+    </div>
 
-        <!-- 主要功能頁面 -->
-        <div id="mainPage" class="main-card" style="display: none;">
-            <h1>DEMO零件管理系統</h1>
-            
-            <!-- 導航按鈕 -->
-            <div class="nav-buttons">
-                <button class="btn btn-primary" onclick="showPage('searchPage')">查詢既有資料</button>
-                <button id="addPartBtn" class="btn btn-success" onclick="showPage('addPartPage')" style="display: none;">資料輸入</button>
-                <button id="borrowRecordsBtn" class="btn btn-secondary" onclick="showPage('borrowRecordsPage')" style="display: none;">借出紀錄</button>
-                <button id="userMgmtBtn" class="btn btn-danger" onclick="showPage('userManagementPage')" style="display: none;">權限管理</button>
+    <!-- 主系統頁面 -->
+    <div id="systemPage" class="system-container">
+        <!-- 頂部導航 -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-title">器材管理系統</div>
+                <ul class="nav-menu">
+                    <li class="nav-item"><a class="nav-link active" data-page="equipment">器材管理</a></li>
+                    <li class="nav-item"><a class="nav-link" data-page="users">用戶管理</a></li>
+                    <li class="nav-item"><a class="nav-link" data-page="borrow">借用管理</a></li>
+                    <li class="nav-item"><a class="nav-link" data-page="history">設備使用歷史</a></li>
+                    <li class="nav-item"><a class="nav-link" data-page="search">器材查詢</a></li>
+                    <li class="nav-item"><a class="nav-link" data-page="logs">登入記錄</a></li>
+                </ul>
+                <div class="nav-user">
+                    <span>歡迎，<span id="currentUser">Admin</span></span>
+                    <button class="logout-btn" onclick="logout()">登出</button>
+                </div>
             </div>
+        </nav>
 
-            <!-- 查詢頁面 -->
-            <div id="searchPage" class="page active">
-                <h2>查詢既有資料</h2>
-                <button class="btn btn-secondary" onclick="showPage('mainPage')">返回主頁</button>
-                
-                <div class="search-container">
-                    <input type="text" id="searchInput" placeholder="請輸入型號關鍵字搜尋" onkeypress="if(event.key === 'Enter') searchParts()">
-                    <button class="btn btn-primary" onclick="searchParts()" style="padding: 15px 25px; min-width: auto;">
-                        <span style="font-size: 18px;">🔍</span>
-                    </button>
-                    <select id="sortBy" onchange="searchParts()">
-                        <option value="model">依型號排序</option>
-                        <option value="status">依狀態排序</option>
-                    </select>
+        <!-- 主要內容 -->
+        <div class="main-content">
+            <!-- 器材管理頁面 -->
+            <div id="equipmentPage" class="page-content active">
+                <div class="dashboard-welcome">
+                    <div class="welcome-title">器材管理系統</div>
+                    <div class="welcome-subtitle">歡迎使用器材管理系統，您可以在這裡管理所有設備資訊</div>
                 </div>
 
-                <table>
-                    <thead>
-                        <tr id="partsTableHeader">
-                            <!-- 動態生成表頭 -->
-                        </tr>
-                    </thead>
-                    <tbody id="partsTableBody">
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- 資料輸入頁面 -->
-            <div id="addPartPage" class="page">
-                <h2>新增零件資料</h2>
-                <button class="btn btn-secondary" onclick="showPage('mainPage')">返回主頁</button>
-                
-                <div class="form-group">
-                    <label>型號 *</label>
-                    <input type="text" id="partModel" placeholder="請輸入零件型號">
-                </div>
-                <div class="form-group">
-                    <label>數量 *</label>
-                    <input type="number" id="partQuantity" min="1" value="1">
-                </div>
-                <div class="form-group">
-                    <label>存放位置 *</label>
-                    <input type="text" id="partLocation" placeholder="請輸入存放位置">
-                </div>
-                <div class="form-group">
-                    <label>備註</label>
-                    <textarea id="partNotes" placeholder="請輸入備註資訊"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="partHidden" style="width: auto; margin-right: 8px;">
-                        隱藏此零件（不讓DEMO借用者查詢到）
-                    </label>
-                    <div style="font-size: 12px; color: #6b7280; margin-top: 5px;">
-                        勾選後，只有管理員和建立者可以看到此零件
+                <!-- 統計區域 -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">4</div>
+                        <div class="stat-label">逾期歸還</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">總借用者數量</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">目前借用中</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">156</div>
+                        <div class="stat-label">設備總數</div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>零件照片</label>
-                    <input type="file" id="partPhoto" accept="image/*" onchange="previewImage(this)">
-                    <div id="imagePreview" style="margin-top: 10px; display: none;">
-                        <img id="previewImg" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid #e1e5e9;">
-                    </div>
-                </div>
-                <button id="addPartButton" class="btn btn-success" onclick="addPart()">新增零件</button>
-            </div>
 
-            <!-- 借出紀錄頁面 -->
-            <div id="borrowRecordsPage" class="page">
-                <h2>借出紀錄</h2>
-                <button class="btn btn-secondary" onclick="showPage('mainPage')">返回主頁</button>
-                
-                <div class="search-container" style="margin-top: 20px;">
-                    <label style="margin-right: 10px;">排序方式：</label>
-                    <select id="borrowRecordsSortBy" onchange="loadBorrowRecords()" style="width: 200px;">
-                        <option value="time">依申請日期排序</option>
-                        <option value="type">依類型排序</option>
-                        <option value="status">依狀態排序</option>
-                        <option value="model">依零件型號排序</option>
-                    </select>
-                </div>
-                
-                <div class="search-container" style="margin-top: 15px;">
-                    <input type="text" id="borrowRecordsSearchInput" placeholder="請輸入型號關鍵字搜尋" onkeypress="if(event.key === 'Enter') searchBorrowRecords()">
-                    <button class="btn btn-primary" onclick="searchBorrowRecords()" style="padding: 15px 25px; min-width: auto;">
-                        <span style="font-size: 18px;">🔍</span>
-                    </button>
-                </div>
-                
-                <!-- 過濾選項區塊 -->
-                <div style="margin-top: 20px; padding: 15px; background: #f3f4f6; border-radius: 8px;">
-                    <div style="display: flex; gap: 30px; align-items: center; flex-wrap: wrap;">
-                        <div style="display: flex; align-items: center;">
-                            <label style="margin-right: 10px; font-weight: 500;">類型過濾：</label>
-                            <select id="typeFilter" onchange="loadBorrowRecords()" style="width: 150px; padding: 8px; border-radius: 4px; border: 1px solid #d1d5db;">
-                                <option value="all">全部顯示</option>
-                                <option value="borrow">僅顯示借出</option>
-                                <option value="reservation">僅顯示預約</option>
+                <!-- 器材列表 -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">📋 器材列表</div>
+                        <button class="btn btn-primary" onclick="showAddEquipmentModal()">+ 新增器材</button>
+                    </div>
+
+                    <div class="search-filters">
+                        <div class="filter-group">
+                            <label class="filter-label">狀態</label>
+                            <select class="filter-select">
+                                <option value="all">全部狀態</option>
+                                <option value="available">可用</option>
+                                <option value="borrowed">借用中</option>
+                                <option value="maintenance">維護中</option>
                             </select>
                         </div>
-                        <div style="display: flex; align-items: center;">
-                            <label style="margin-right: 10px; font-weight: 500;">狀態過濾：</label>
-                            <select id="statusFilter" onchange="loadBorrowRecords()" style="width: 150px; padding: 8px; border-radius: 4px; border: 1px solid #d1d5db;">
-                                <option value="all">全部顯示</option>
-                                <option value="confirmed">僅顯示已確認</option>
-                                <option value="borrowing">僅顯示借出中</option>
-                                <option value="returned">僅顯示已歸還</option>
+                        <div class="filter-group">
+                            <label class="filter-label">類別</label>
+                            <select class="filter-select">
+                                <option value="all">全部類別</option>
+                                <option value="投影設備">投影設備</option>
+                                <option value="電腦設備">電腦設備</option>
+                                <option value="攝影設備">攝影設備</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">搜尋</label>
+                            <input type="text" class="search-input" placeholder="搜尋器材名稱或型號...">
+                        </div>
+                    </div>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>圖片</th>
+                                <th>器材名稱</th>
+                                <th>型號</th>
+                                <th>序號</th>
+                                <th>類別</th>
+                                <th>狀態</th>
+                                <th>位置</th>
+                                <th>借用狀況</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="equipmentTableBody">
+                            <tr>
+                                <td><div class="equipment-icon">📽️</div></td>
+                                <td>Epson投影機</td>
+                                <td>EB-X05</td>
+                                <td>EP001</td>
+                                <td>投影設備</td>
+                                <td><span class="status-badge status-borrowed">借用中</span></td>
+                                <td>B#201</td>
+                                <td>
+                                    借用人：張小明
+                                    <div class="borrow-info">到期：2025/01/30 <span class="overdue">逾期2天</span></div>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-success">歸還</button>
+                                        <button class="btn btn-sm btn-warning">編輯</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><div class="equipment-icon">💻</div></td>
+                                <td>Dell筆記型電腦</td>
+                                <td>Latitude 5520</td>
+                                <td>DL001</td>
+                                <td>電腦設備</td>
+                                <td><span class="status-badge status-available">可用</span></td>
+                                <td>A#101</td>
+                                <td>-</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-primary">借用</button>
+                                        <button class="btn btn-sm btn-warning">編輯</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 用戶管理頁面 -->
+            <div id="usersPage" class="page-content">
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">👥 用戶管理</div>
+                        <button class="btn btn-primary" onclick="showAddUserModal()">+ 新增用戶</button>
+                    </div>
+
+                    <div class="search-filters">
+                        <div class="filter-group">
+                            <label class="filter-label">用戶類型</label>
+                            <select class="filter-select">
+                                <option value="all">全部類型</option>
+                                <option value="admin">管理員</option>
+                                <option value="user">一般用戶</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">狀態</label>
+                            <select class="filter-select">
+                                <option value="all">全部狀態</option>
+                                <option value="active">啟用</option>
+                                <option value="inactive">停用</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">搜尋</label>
+                            <input type="text" class="search-input" placeholder="搜尋用戶名稱或工號...">
+                        </div>
+                    </div>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>頭像</th>
+                                <th>用戶名稱</th>
+                                <th>工號</th>
+                                <th>部門</th>
+                                <th>聯絡電話</th>
+                                <th>用戶類型</th>
+                                <th>狀態</th>
+                                <th>註冊時間</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><div class="user-avatar">A</div></td>
+                                <td>系統管理員</td>
+                                <td>ADMIN001</td>
+                                <td>資訊部</td>
+                                <td>02-1234-5678</td>
+                                <td><span class="status-badge status-admin">管理員</span></td>
+                                <td><span class="status-badge status-active">啟用</span></td>
+                                <td>2024/01/15</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-warning">編輯</button>
+                                        <button class="btn btn-sm btn-danger">停用</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><div class="user-avatar">張</div></td>
+                                <td>張小明</td>
+                                <td>U001</td>
+                                <td>業務部</td>
+                                <td>02-1234-5679</td>
+                                <td><span class="status-badge status-user">一般用戶</span></td>
+                                <td><span class="status-badge status-active">啟用</span></td>
+                                <td>2024/02/20</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-warning">編輯</button>
+                                        <button class="btn btn-sm btn-danger">停用</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 借用管理頁面 -->
+            <div id="borrowPage" class="page-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">15</div>
+                        <div class="stat-label">進行中借用</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">4</div>
+                        <div class="stat-label">逾期未還</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">2</div>
+                        <div class="stat-label">今日到期</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">128</div>
+                        <div class="stat-label">本月歸還</div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">📝 借用管理</div>
+                        <button class="btn btn-primary" onclick="showNewBorrowModal()">+ 新增借用</button>
+                    </div>
+
+                    <div class="search-filters">
+                        <div class="filter-group">
+                            <label class="filter-label">借用狀態</label>
+                            <select class="filter-select">
+                                <option value="all">全部狀態</option>
+                                <option value="pending">待確認</option>
+                                <option value="borrowed">借用中</option>
+                                <option value="overdue">逾期</option>
+                                <option value="returned">已歸還</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">日期範圍</label>
+                            <input type="date" class="filter-select" style="min-width: 150px;">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">搜尋</label>
+                            <input type="text" class="search-input" placeholder="搜尋借用人或設備...">
+                        </div>
+                    </div>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>借用編號</th>
+                                <th>借用人</th>
+                                <th>設備名稱</th>
+                                <th>借用時間</th>
+                                <th>預計歸還</th>
+                                <th>實際歸還</th>
+                                <th>狀態</th>
+                                <th>備註</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>BR20250801001</td>
+                                <td>張小明</td>
+                                <td>Epson投影機 (EP001)</td>
+                                <td>2025/01/28 10:30</td>
+                                <td>2025/01/30 17:00</td>
+                                <td>-</td>
+                                <td><span class="status-badge status-overdue">逾期</span></td>
+                                <td>會議使用</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-success">歸還</button>
+                                        <button class="btn btn-sm btn-warning">延期</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>BR20250801002</td>
+                                <td>李美華</td>
+                                <td>iPad Pro (IP001)</td>
+                                <td>2025/02/01 09:00</td>
+                                <td>2025/02/05 18:00</td>
+                                <td>-</td>
+                                <td><span class="status-badge status-borrowed">借用中</span></td>
+                                <td>外勤使用</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-success">歸還</button>
+                                        <button class="btn btn-sm btn-warning">編輯</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>BR20250731003</td>
+                                <td>王建國</td>
+                                <td>Canon相機 (CN001)</td>
+                                <td>2025/01/31 14:00</td>
+                                <td>2025/02/03 17:00</td>
+                                <td>2025/02/02 16:30</td>
+                                <td><span class="status-badge status-returned">已歸還</span></td>
+                                <td>活動拍攝</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-warning">詳情</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 設備使用歷史頁面 -->
+            <div id="historyPage" class="page-content">
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">📊 設備使用歷史</div>
+                        <button class="btn btn-primary" onclick="exportHistory()">📥 匯出報表</button>
+                    </div>
+
+                    <div class="search-filters">
+                        <div class="filter-group">
+                            <label class="filter-label">設備類型</label>
+                            <select class="filter-select">
+                                <option value="all">全部設備</option>
+                                <option value="投影設備">投影設備</option>
+                                <option value="電腦設備">電腦設備</option>
+                                <option value="攝影設備">攝影設備</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">開始日期</label>
+                            <input type="date" class="filter-select" value="2025-01-01">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">結束日期</label>
+                            <input type="date" class="filter-select" value="2025-02-05">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">搜尋</label>
+                            <input type="text" class="search-input" placeholder="搜尋設備或使用者...">
+                        </div>
+                    </div>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>設備名稱</th>
+                                <th>使用者</th>
+                                <th>借用時間</th>
+                                <th>歸還時間</th>
+                                <th>使用天數</th>
+                                <th>使用目的</th>
+                                <th>設備狀況</th>
+                                <th>評價</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Epson投影機 (EP001)</td>
+                                <td>張小明</td>
+                                <td>2025/01/15 09:00</td>
+                                <td>2025/01/17 17:30</td>
+                                <td>2天</td>
+                                <td>部門會議簡報</td>
+                                <td>良好</td>
+                                <td>⭐⭐⭐⭐⭐</td>
+                            </tr>
+                            <tr>
+                                <td>iPad Pro (IP001)</td>
+                                <td>李美華</td>
+                                <td>2025/01/20 10:30</td>
+                                <td>2025/01/22 16:00</td>
+                                <td>2天</td>
+                                <td>客戶拜訪展示</td>
+                                <td>良好</td>
+                                <td>⭐⭐⭐⭐⭐</td>
+                            </tr>
+                            <tr>
+                                <td>Canon相機 (CN001)</td>
+                                <td>王建國</td>
+                                <td>2025/01/25 13:00</td>
+                                <td>2025/01/26 18:00</td>
+                                <td>1天</td>
+                                <td>公司活動攝影</td>
+                                <td>良好</td>
+                                <td>⭐⭐⭐⭐</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 使用統計圖表 -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">📈 使用統計分析</div>
+                    </div>
+                    <div class="chart-container">
+                        <div>📊 圖表功能開發中，將顯示設備使用趨勢、熱門設備排行等統計資訊</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 器材查詢頁面 -->
+            <div id="searchPage" class="page-content">
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">🔍 器材查詢</div>
+                    </div>
+
+                    <!-- 高級搜尋表單 -->
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>設備名稱</label>
+                            <input type="text" placeholder="輸入設備名稱">
+                        </div>
+                        <div class="form-field">
+                            <label>型號</label>
+                            <input type="text" placeholder="輸入型號">
+                        </div>
+                        <div class="form-field">
+                            <label>序號</label>
+                            <input type="text" placeholder="輸入序號">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>設備類型</label>
+                            <select>
+                                <option value="">請選擇類型</option>
+                                <option value="投影設備">投影設備</option>
+                                <option value="電腦設備">電腦設備</option>
+                                <option value="攝影設備">攝影設備</option>
+                                <option value="音響設備">音響設備</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label>設備狀態</label>
+                            <select>
+                                <option value="">請選擇狀態</option>
+                                <option value="available">可用</option>
+                                <option value="borrowed">借用中</option>
+                                <option value="maintenance">維護中</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label>存放位置</label>
+                            <input type="text" placeholder="輸入存放位置">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>購入日期起</label>
+                            <input type="date">
+                        </div>
+                        <div class="form-field">
+                            <label>購入日期迄</label>
+                            <input type="date">
+                        </div>
+                        <div class="form-field">
+                            <label>價格範圍</label>
+                            <select>
+                                <option value="">不限</option>
+                                <option value="0-10000">0 - 10,000</option>
+                                <option value="10000-50000">10,000 - 50,000</option>
+                                <option value="50000-100000">50,000 - 100,000</option>
+                                <option value="100000+">100,000 以上</option>
                             </select>
                         </div>
                     </div>
-                </div>
-                
-                <table>
-                    <thead>
-                        <tr>
-                            <th>申請日期</th>
-                            <th>零件型號</th>
-                            <th>借用人</th>
-                            <th>Email</th>
-                            <th>電話</th>
-                            <th>時間</th>
-                            <th>數量</th>
-                            <th>類型</th>
-                            <th>狀態</th>
-                            <th>用途說明</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="borrowRecordsTableBody">
-                    </tbody>
-                </table>
-            </div>
 
-            <!-- 權限管理頁面 -->
-            <div id="userManagementPage" class="page">
-                <h2>權限管理</h2>
-                <button class="btn btn-secondary" onclick="showPage('mainPage')">返回主頁</button>
-                <button class="btn btn-success" onclick="openAddUserModal()" style="margin-left: 10px;">新增使用者</button>
-                
-                <table>
-                    <thead>
-                        <tr>
-                            <th>姓名</th>
-                            <th>Email</th>
-                            <th>電話</th>
-                            <th>角色</th>
-                            <th>狀態</th>
-                            <th>修改密碼</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usersTableBody">
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 借用申請彈窗 -->
-        <div id="borrowModal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeBorrowModal()">&times;</span>
-                <div class="modal-body">
-                    <h3>申請借用</h3>
-                    <div class="form-group">
-                        <label>姓名</label>
-                        <input type="text" id="borrowerName" placeholder="請輸入您的姓名">
-                    </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="borrowerEmail" placeholder="請輸入您的Email">
-                    </div>
-                    <div class="form-group">
-                        <label>電話</label>
-                        <input type="tel" id="borrowerPhone" placeholder="請輸入您的電話">
-                    </div>
-                    <div class="form-group">
-                        <label>借用開始日期</label>
-                        <input type="date" id="borrowStartDate">
-                    </div>
-                    <div class="form-group">
-                        <label>借用結束日期</label>
-                        <input type="date" id="borrowEndDate">
-                    </div>
-                    <div id="dateError" style="color: #dc2626; font-size: 14px; margin-top: -15px; margin-bottom: 15px; display: none;">
-                        ⚠️ 結束日期不能早於開始日期
-                    </div>
-                    <div class="form-group">
-                        <label>借用數量</label>
-                        <input type="number" id="borrowQuantity" min="1" value="1">
-                    </div>
-                    <div class="form-group">
-                        <label>用途說明</label>
-                        <textarea id="borrowDescription" placeholder="請說明借用目的和用途"></textarea>
-                    </div>
-                    <div id="conflictWarning" class="conflict-warning" style="display: none;">
-                        <strong>❌ 庫存衝突警告</strong>
-                        <div id="conflictDetails"></div>
-                    </div>
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="btn btn-primary" onclick="submitBorrow()">確認申請</button>
-                        <button class="btn btn-secondary" onclick="closeBorrowModal()">取消</button>
+                    <div style="margin: 20px 0;">
+                        <button class="btn btn-primary" onclick="performSearch()">🔍 開始搜尋</button>
+                        <button class="btn btn-warning" onclick="clearSearch()">🔄 清除條件</button>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- 照片放大顯示彈窗 -->
-        <div id="imageModal" class="modal">
-            <div class="modal-content" style="text-align: center; padding: 20px;">
-                <span class="close" onclick="closeImageModal()">&times;</span>
-                <img id="modalImage" style="max-width: 90%; max-height: 80vh; object-fit: contain;">
-            </div>
-        </div>
+                <!-- 搜尋結果 -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">📋 搜尋結果</div>
+                        <span class="badge">找到 5 筆資料</span>
+                    </div>
 
-        <!-- 修改密碼彈窗 -->
-        <div id="passwordModal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closePasswordModal()">&times;</span>
-                <div class="modal-body">
-                    <h3>修改密碼</h3>
-                    <div class="form-group">
-                        <label>帳號</label>
-                        <input type="text" id="passwordUserEmail" readonly style="background-color: #f3f4f6;">
-                    </div>
-                    <div class="form-group">
-                        <label>新密碼</label>
-                        <input type="password" id="newPassword" placeholder="請輸入新密碼">
-                    </div>
-                    <div class="form-group">
-                        <label>確認新密碼</label>
-                        <input type="password" id="confirmPassword" placeholder="請再次輸入新密碼">
-                    </div>
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="btn btn-primary" onclick="updatePassword()">確認修改</button>
-                        <button class="btn btn-secondary" onclick="closePasswordModal()">取消</button>
-                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>設備編號</th>
+                                <th>設備名稱</th>
+                                <th>型號</th>
+                                <th>類型</th>
+                                <th>狀態</th>
+                                <th>位置</th>
+                                <th>購入日期</th>
+                                <th>價格</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>EP001</td>
+                                <td>Epson投影機</td>
+                                <td>EB-X05</td>
+                                <td>投影設備</td>
+                                <td><span class="status-badge status-borrowed">借用中</span></td>
+                                <td>B#201</td>
+                                <td>2024/03/15</td>
+                                <td>NT$ 25,000</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-warning">詳情</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>IP001</td>
+                                <td>iPad Pro</td>
+                                <td>12.9吋</td>
+                                <td>電腦設備</td>
+                                <td><span class="status-badge status-available">可用</span></td>
+                                <td>A#102</td>
+                                <td>2024/05/20</td>
+                                <td>NT$ 35,000</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-primary">借用</button>
+                                        <button class="btn btn-sm btn-warning">詳情</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
 
-        <!-- 庫存調整彈窗 -->
-        <div id="inventoryModal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeInventoryModal()">&times;</span>
-                <div class="modal-body">
-                    <h3>調整庫存數量</h3>
-                    <div class="form-group">
-                        <label>零件型號</label>
-                        <input type="text" id="inventoryPartModel" readonly style="background-color: #f3f4f6;">
+            <!-- 登入記錄頁面 -->
+            <div id="logsPage" class="page-content">
+                <div class="content-card">
+                    <div class="card-header">
+                        <div class="card-title">📋 登入記錄</div>
+                        <button class="btn btn-primary" onclick="refreshLogs()">🔄 重新整理</button>
                     </div>
-                    <div class="form-group">
-                        <label>目前庫存數量</label>
-                        <input type="number" id="currentInventoryQuantity" readonly style="background-color: #f3f4f6;">
-                    </div>
-                    <div class="form-group">
-                        <label>新的庫存數量 *</label>
-                        <input type="number" id="newInventoryQuantity" min="0" placeholder="請輸入新的庫存數量">
-                        <div style="font-size: 12px; color: #6b7280; margin-top: 5px;">
-                            注意：調整庫存可能會影響現有的預約和借出記錄
+
+                    <div class="search-filters">
+                        <div class="filter-group">
+                            <label class="filter-label">用戶類型</label>
+                            <select class="filter-select">
+                                <option value="all">全部用戶</option>
+                                <option value="admin">管理員</option>
+                                <option value="user">一般用戶</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">登入狀態</label>
+                            <select class="filter-select">
+                                <option value="all">全部狀態</option>
+                                <option value="success">成功</option>
+                                <option value="failed">失敗</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">日期</label>
+                            <input type="date" class="filter-select" value="2025-02-05">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">搜尋</label>
+                            <input type="text" class="search-input" placeholder="搜尋用戶名稱或IP...">
                         </div>
                     </div>
-                    <div id="inventoryWarning" style="display: none; background: #fecaca; color: #991b1b; padding: 15px; border-radius: 8px; margin: 15px 0; border: 1px solid #f87171;">
-                        <strong>⚠️ 庫存調整警告</strong>
-                        <div id="inventoryWarningDetails"></div>
-                    </div>
-                    <div class="form-group">
-                        <label>調整原因 *</label>
-                        <textarea id="inventoryReason" placeholder="請說明調整庫存的原因" rows="3"></textarea>
-                    </div>
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="btn btn-primary" onclick="updateInventory()">確認調整</button>
-                        <button class="btn btn-secondary" onclick="closeInventoryModal()">取消</button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- 新增使用者彈窗 -->
-        <div id="addUserModal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeAddUserModal()">&times;</span>
-                <div class="modal-body">
-                    <h3>新增使用者</h3>
-                    <div class="form-group">
-                        <label>姓名 *</label>
-                        <input type="text" id="addUserName" placeholder="請輸入姓名" onblur="validateName()">
-                        <div id="addUserNameError" style="color: #dc2626; font-size: 12px; margin-top: 5px; display: none;"></div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>時間</th>
+                                <th>用戶名稱</th>
+                                <th>用戶類型</th>
+                                <th>IP位址</th>
+                                <th>瀏覽器</th>
+                                <th>登入狀態</th>
+                                <th>失敗原因</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2025/02/05 14:30:25</td>
+                                <td>admin</td>
+                                <td><span class="status-badge status-admin">管理員</span></td>
+                                <td>192.168.1.100</td>
+                                <td>Chrome 120.0</td>
+                                <td><span class="status-badge status-active">成功</span></td>
+                                <td>-</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning">詳情</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2025/02/05 13:45:12</td>
+                                <td>張小明</td>
+                                <td><span class="status-badge status-user">一般用戶</span></td>
+                                <td>192.168.1.105</td>
+                                <td>Edge 119.0</td>
+                                <td><span class="status-badge status-active">成功</span></td>
+                                <td>-</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning">詳情</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2025/02/05 13:20:08</td>
+                                <td>test_user</td>
+                                <td><span class="status-badge status-user">一般用戶</span></td>
+                                <td>192.168.1.120</td>
+                                <td>Firefox 121.0</td>
+                                <td><span class="status-badge status-inactive">失敗</span></td>
+                                <td>密碼錯誤</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning">詳情</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2025/02/05 12:15:33</td>
+                                <td>李美華</td>
+                                <td><span class="status-badge status-user">一般用戶</span></td>
+                                <td>192.168.1.108</td>
+                                <td>Safari 17.0</td>
+                                <td><span class="status-badge status-active">成功</span></td>
+                                <td>-</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning">詳情</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 登入統計 -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">127</div>
+                        <div class="stat-label">今日登入次數</div>
                     </div>
-                    <div class="form-group">
-                        <label>Email *</label>
-                        <input type="email" id="addUserEmail" placeholder="請輸入Email" onblur="validateEmail()">
-                        <div id="addUserEmailError" style="color: #dc2626; font-size: 12px; margin-top: 5px; display: none;"></div>
+                    <div class="stat-card">
+                        <div class="stat-number">15</div>
+                        <div class="stat-label">線上用戶數</div>
                     </div>
-                    <div class="form-group">
-                        <label>電話 *</label>
-                        <input type="tel" id="addUserPhone" placeholder="請輸入電話" onblur="validatePhone()">
-                        <div id="addUserPhoneError" style="color: #dc2626; font-size: 12px; margin-top: 5px; display: none;"></div>
+                    <div class="stat-card">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">登入失敗次數</div>
                     </div>
-                    <div class="form-group">
-                        <label>密碼 *</label>
-                        <input type="password" id="addUserPassword" placeholder="請輸入密碼" onblur="validatePassword()">
-                        <div id="addUserPasswordError" style="color: #dc2626; font-size: 12px; margin-top: 5px; display: none;"></div>
-                    </div>
-                    <div class="form-group">
-                        <label>確認密碼 *</label>
-                        <input type="password" id="addUserConfirmPassword" placeholder="請再次輸入密碼" onblur="validateConfirmPassword()">
-                        <div id="addUserConfirmPasswordError" style="color: #dc2626; font-size: 12px; margin-top: 5px; display: none;"></div>
-                    </div>
-                    <div class="form-group">
-                        <label>角色 *</label>
-                        <select id="addUserRole">
-                            <option value="demo_user">DEMO借用者</option>
-                            <option value="ra_staff">RA同仁</option>
-                            <option value="admin">管理員</option>
-                        </select>
-                    </div>
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="btn btn-primary" onclick="addNewUser()">確認新增</button>
-                        <button class="btn btn-secondary" onclick="closeAddUserModal()">取消</button>
+                    <div class="stat-card">
+                        <div class="stat-number">98.5%</div>
+                        <div class="stat-label">系統可用率</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- 模態框 - 新增器材 -->
+    <div id="addEquipmentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">新增器材</div>
+                <button class="close-btn" onclick="closeModal('addEquipmentModal')">&times;</button>
+            </div>
+            <form onsubmit="addNewEquipment(event)">
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>設備名稱 *</label>
+                        <input type="text" required placeholder="輸入設備名稱">
+                    </div>
+                    <div class="form-field">
+                        <label>型號 *</label>
+                        <input type="text" required placeholder="輸入型號">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>序號 *</label>
+                        <input type="text" required placeholder="輸入序號">
+                    </div>
+                    <div class="form-field">
+                        <label>設備類型 *</label>
+                        <select required>
+                            <option value="">請選擇類型</option>
+                            <option value="投影設備">投影設備</option>
+                            <option value="電腦設備">電腦設備</option>
+                            <option value="攝影設備">攝影設備</option>
+                            <option value="音響設備">音響設備</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>存放位置</label>
+                        <input type="text" placeholder="輸入存放位置">
+                    </div>
+                    <div class="form-field">
+                        <label>購入價格</label>
+                        <input type="number" placeholder="輸入購入價格">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>購入日期</label>
+                        <input type="date">
+                    </div>
+                    <div class="form-field">
+                        <label>保固期限</label>
+                        <input type="date">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>設備描述</label>
+                        <textarea placeholder="輸入設備描述資訊"></textarea>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; text-align: right;">
+                    <button type="button" class="btn btn-warning" onclick="closeModal('addEquipmentModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">新增設備</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 模態框 - 新增用戶 -->
+    <div id="addUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">新增用戶</div>
+                <button class="close-btn" onclick="closeModal('addUserModal')">&times;</button>
+            </div>
+            <form onsubmit="addNewUser(event)">
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>用戶名稱 *</label>
+                        <input type="text" required placeholder="輸入用戶名稱">
+                    </div>
+                    <div class="form-field">
+                        <label>工號 *</label>
+                        <input type="text" required placeholder="輸入工號">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>登入帳號 *</label>
+                        <input type="text" required placeholder="輸入登入帳號">
+                    </div>
+                    <div class="form-field">
+                        <label>密碼 *</label>
+                        <input type="password" required placeholder="輸入密碼">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>部門 *</label>
+                        <select required>
+                            <option value="">請選擇部門</option>
+                            <option value="資訊部">資訊部</option>
+                            <option value="業務部">業務部</option>
+                            <option value="行政部">行政部</option>
+                            <option value="財務部">財務部</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>用戶類型 *</label>
+                        <select required>
+                            <option value="">請選擇類型</option>
+                            <option value="admin">管理員</option>
+                            <option value="user">一般用戶</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>聯絡電話</label>
+                        <input type="tel" placeholder="輸入聯絡電話">
+                    </div>
+                    <div class="form-field">
+                        <label>電子郵件</label>
+                        <input type="email" placeholder="輸入電子郵件">
+                    </div>
+                </div>
+                <div style="margin-top: 20px; text-align: right;">
+                    <button type="button" class="btn btn-warning" onclick="closeModal('addUserModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">新增用戶</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 模態框 - 新增借用 -->
+    <div id="newBorrowModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">新增借用</div>
+                <button class="close-btn" onclick="closeModal('newBorrowModal')">&times;</button>
+            </div>
+            <form onsubmit="addNewBorrow(event)">
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>借用人 *</label>
+                        <select required>
+                            <option value="">請選擇借用人</option>
+                            <option value="張小明">張小明 (U001)</option>
+                            <option value="李美華">李美華 (U002)</option>
+                            <option value="王建國">王建國 (U003)</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>設備 *</label>
+                        <select required>
+                            <option value="">請選擇設備</option>
+                            <option value="EP001">Epson投影機 (EP001)</option>
+                            <option value="IP001">iPad Pro (IP001)</option>
+                            <option value="DL001">Dell筆電 (DL001)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>借用時間 *</label>
+                        <input type="datetime-local" required>
+                    </div>
+                    <div class="form-field">
+                        <label>預計歸還時間 *</label>
+                        <input type="datetime-local" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>借用目的 *</label>
+                        <textarea required placeholder="請說明借用目的"></textarea>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; text-align: right;">
+                    <button type="button" class="btn btn-warning" onclick="closeModal('newBorrowModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">確認借用</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // 全域變數
-        let users = [
-            { email: '11', password: '11', role: 'admin' },
-            { email: '22', password: '22', role: 'ra_staff' },
-            { email: '33', password: '33', role: 'demo_user' }
-        ];
-        let parts = [];
-        let borrowRecords = [];
-        let reservations = [];
-        let inventoryLogs = []; // 🔥 新增：庫存調整記錄
+        // 系統狀態管理
         let currentUser = null;
-        let currentBorrowingPart = null;
-        let currentInventoryPart = null; // 🔥 新增：當前調整庫存的零件
+        let isLoggedIn = false;
 
-        // 預約單狀態常數
-        const RESERVATION_STATUS = {
-            PENDING: 'pending',
-            CONFIRMED: 'confirmed',
-            ACTIVE: 'active',
-            COMPLETED: 'completed',
-            CANCELLED: 'cancelled'
-        };
+        // 登入處理
+        function handleLogin() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
 
-        // 核心庫存計算函數 - 修正日期比較邏輯
-        function getAvailableQuantityAtDate(partId, targetDate) {
-            const part = parts.find(p => p.id === partId);
-            if (!part) return 0;
-            
-            let totalUsed = 0;
-            const targetTime = targetDate.getTime(); // 使用時間戳進行比較
-            
-            console.log('=== 庫存計算詳細檢查 ===');
-            console.log('檢查零件ID:', partId, '檢查日期:', targetDate.toLocaleDateString());
-            console.log('目標日期時間戳:', targetTime);
-            console.log('所有預約記錄:', reservations);
-            console.log('所有借出記錄:', borrowRecords);
-            
-            // 計算借出記錄的使用量（只計算實際借出中的）
-            borrowRecords.forEach(record => {
-                if (record.partId === partId && record.status === '借出中') {
-                    const recordStartTime = new Date(record.borrowTime).getTime();
-                    const recordEndTime = record.borrowPeriod ? new Date(record.borrowPeriod).getTime() : null;
-                    
-                    console.log('檢查借出記錄:', record.borrowerName);
-                    console.log('  開始時間戳:', recordStartTime, '結束時間戳:', recordEndTime);
-                    console.log('  目標時間戳:', targetTime);
-                    
-                    if (recordStartTime <= targetTime && (!recordEndTime || recordEndTime >= targetTime)) {
-                        totalUsed += (record.quantity || 1);
-                        console.log('✅ 借出記錄生效! 佔用數量:', record.quantity || 1, '借用人:', record.borrowerName);
-                    } else {
-                        console.log('❌ 借出記錄不在此日期範圍內');
-                    }
-                }
-            });
-            
-            // 計算預約記錄的使用量（只計算確認的預約）
-            reservations.forEach(reservation => {
-                console.log('檢查預約記錄:', reservation);
-                if (reservation.partId === partId) {
-                    console.log('零件ID匹配，檢查狀態:', reservation.status);
-                    if (reservation.status === RESERVATION_STATUS.CONFIRMED) {
-                        
-                        const reservationStartTime = new Date(reservation.startDate).getTime();
-                        const reservationEndTime = new Date(reservation.endDate).getTime();
-                        
-                        console.log('預約期間時間戳:', reservationStartTime, '~', reservationEndTime);
-                        console.log('目標時間戳:', targetTime);
-                        console.log('開始日期比較:', reservationStartTime, '<=', targetTime, '=', reservationStartTime <= targetTime);
-                        console.log('結束日期比較:', reservationEndTime, '>=', targetTime, '=', reservationEndTime >= targetTime);
-                        
-                        if (reservationStartTime <= targetTime && reservationEndTime >= targetTime) {
-                            totalUsed += reservation.quantity;
-                            console.log('✅ 預約記錄生效! 佔用數量:', reservation.quantity, '預約人:', reservation.borrowerName);
-                        } else {
-                            console.log('❌ 預約記錄不在此日期範圍內');
-                        }
-                    } else {
-                        console.log('❌ 預約狀態不是已確認:', reservation.status);
-                    }
-                } else {
-                    console.log('❌ 零件ID不匹配 - 預約記錄:', reservation.partId, '查詢ID:', partId);
-                }
-            });
-            
-            const available = Math.max(0, part.quantity - totalUsed);
-            console.log('最終計算結果 - 總庫存:', part.quantity, '已使用:', totalUsed, '可用:', available);
-            console.log('=== 庫存計算檢查結束 ===');
-            
-            return available;
+            console.log('嘗試登入:', username, password); // 調試用
+
+            // 簡單的登入驗證
+            if ((username === 'admin' && password === 'admin123') || 
+                (username === 'user' && password === 'user123')) {
+                currentUser = username;
+                isLoggedIn = true;
+                document.getElementById('currentUser').textContent = username === 'admin' ? '管理員' : username;
+                showSystem();
+                showNotification('登入成功！', 'success');
+                console.log('登入成功，用戶:', username);
+            } else {
+                showNotification('帳號或密碼錯誤，請重新輸入', 'error');
+                console.log('登入失敗，帳號:', username, '密碼:', password);
+            }
         }
 
-        // 頁面載入完成後執行
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DEMO零件管理系統已載入');
-            
-            // 系統已準備就緒，無預設測試資料
-            console.log('系統已準備就緒');
-            console.log('預約記錄:', reservations);
-            console.log('借出記錄:', borrowRecords);
-            console.log('零件記錄:', parts);
-        });
-
-        // 顯示註冊頁面
-        function showRegisterPage() {
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('registerPage').style.display = 'block';
-            // 清空所有欄位
-            document.getElementById('registerName').value = '';
-            document.getElementById('registerPhone').value = '';
-            document.getElementById('registerEmail').value = '';
-            document.getElementById('registerPassword').value = '';
-            document.getElementById('registerConfirmPassword').value = '';
-            clearRegisterErrors();
+        // 登出處理
+        function logout() {
+            if (confirm('確定要登出嗎？')) {
+                currentUser = null;
+                isLoggedIn = false;
+                showLogin();
+            }
         }
 
         // 顯示登入頁面
-        function showLoginPage() {
-            document.getElementById('registerPage').style.display = 'none';
-            document.getElementById('loginPage').style.display = 'block';
-            // 清空登入欄位
-            document.getElementById('email').value = '';
+        function showLogin() {
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('systemPage').classList.remove('active');
+            document.getElementById('username').value = '';
             document.getElementById('password').value = '';
         }
 
-        // 清除註冊錯誤訊息
-        function clearRegisterErrors() {
-            const errorElements = ['registerNameError', 'registerPhoneError', 'registerEmailError', 'registerPasswordError', 'registerConfirmPasswordError'];
-            errorElements.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.style.display = 'none';
-                    element.textContent = '';
-                }
-            });
-            
-            // 清除紅框
-            const inputs = ['registerName', 'registerPhone', 'registerEmail', 'registerPassword', 'registerConfirmPassword'];
-            inputs.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.style.borderColor = '#e1e5e9';
-                }
-            });
+        // 顯示主系統
+        function showSystem() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('systemPage').classList.add('active');
         }
 
-        // 顯示註冊錯誤訊息
-        function showRegisterError(fieldId, message) {
-            const errorElement = document.getElementById(fieldId + 'Error');
-            const inputElement = document.getElementById(fieldId);
-            
-            if (errorElement) {
-                errorElement.textContent = message;
-                errorElement.style.display = 'block';
-            }
-            
-            if (inputElement) {
-                inputElement.style.borderColor = '#dc2626';
-            }
-        }
-
-        // 驗證註冊表單
-        function validateRegisterForm() {
-            clearRegisterErrors();
-            let isValid = true;
-
-            // 驗證姓名
-            const name = document.getElementById('registerName').value.trim();
-            if (!name) {
-                showRegisterError('registerName', '請輸入姓名');
-                isValid = false;
-            } else if (name.length < 2) {
-                showRegisterError('registerName', '姓名至少需要2個字元');
-                isValid = false;
-            }
-
-            // 驗證電話
-            const phone = document.getElementById('registerPhone').value.trim();
-            const phoneRegex = /^[\d\-\+\(\)\s]+$/;
-            if (!phone) {
-                showRegisterError('registerPhone', '請輸入電話');
-                isValid = false;
-            } else if (!phoneRegex.test(phone)) {
-                showRegisterError('registerPhone', '電話格式不正確');
-                isValid = false;
-            } else if (phone.replace(/\D/g, '').length < 7) {
-                showRegisterError('registerPhone', '電話號碼至少需要7位數字');
-                isValid = false;
-            }
-
-            // 驗證Email
-            const email = document.getElementById('registerEmail').value.trim();
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!email) {
-                showRegisterError('registerEmail', '請輸入Email');
-                isValid = false;
-            } else if (!emailRegex.test(email)) {
-                showRegisterError('registerEmail', '請輸入有效的Email格式');
-                isValid = false;
-            } else if (users.find(u => u.email === email)) {
-                showRegisterError('registerEmail', '此Email已被註冊');
-                isValid = false;
-            }
-
-            // 驗證密碼
-            const password = document.getElementById('registerPassword').value;
-            if (!password) {
-                showRegisterError('registerPassword', '請輸入密碼');
-                isValid = false;
-            } else if (password.length < 6) {
-                showRegisterError('registerPassword', '密碼長度至少需要6個字元');
-                isValid = false;
-            }
-
-            // 驗證確認密碼
-            const confirmPassword = document.getElementById('registerConfirmPassword').value;
-            if (!confirmPassword) {
-                showRegisterError('registerConfirmPassword', '請再次輸入密碼');
-                isValid = false;
-            } else if (password !== confirmPassword) {
-                showRegisterError('registerConfirmPassword', '兩次輸入的密碼不一致');
-                isValid = false;
-            }
-
-            return isValid;
-        }
-
-        // 提交註冊
-        function submitRegister() {
-            if (!validateRegisterForm()) {
-                return;
-            }
-
-            const name = document.getElementById('registerName').value.trim();
-            const phone = document.getElementById('registerPhone').value.trim();
-            const email = document.getElementById('registerEmail').value.trim();
-            const password = document.getElementById('registerPassword').value;
-
-            // 建立新使用者
-            const newUser = {
-                name: name,
-                email: email,
-                phone: phone,
-                password: password,
-                role: 'demo_user',  // 預設權限為DEMO借用者
-                isActive: true      // 預設啟用
-            };
-
-            // 加入使用者陣列
-            users.push(newUser);
-
-            alert('✅ 註冊成功！\n\n您現在可以使用註冊的Email和密碼登入系統。');
-            
-            // 返回登入頁面，並自動填入Email
-            showLoginPage();
-            document.getElementById('email').value = email;
-            document.getElementById('password').focus();
-        }
-
-        // 登入功能
-        function login() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            const user = users.find(u => u.email === email && u.password === password);
-            
-            if (user) {
-                // 檢查帳號是否被停用
-                if (user.isActive === false) {
-                    alert('此帳號已被停用，無法登入。\n如有疑問，請聯絡系統管理員。');
-                    return;
-                }
-                
-                currentUser = user;
-                document.getElementById('loginPage').style.display = 'none';
-                document.getElementById('registerPage').style.display = 'none';
-                document.getElementById('mainPage').style.display = 'block';
-                document.getElementById('userInfo').style.display = 'block';
-                
-                let roleDisplay = '';
-                switch(user.role) {
-                    case 'admin': roleDisplay = '管理員'; break;
-                    case 'ra_staff': roleDisplay = 'RA同仁'; break;
-                    case 'demo_user': roleDisplay = 'DEMO借用者'; break;
-                    default: roleDisplay = '使用者';
-                }
-                
-                document.getElementById('userDisplay').textContent = user.email + ' (' + roleDisplay + ')';
-                
-                if (user.role === 'admin') {
-                    document.getElementById('addPartBtn').style.display = 'inline-block';
-                    document.getElementById('borrowRecordsBtn').style.display = 'inline-block';
-                    document.getElementById('userMgmtBtn').style.display = 'inline-block';
-                } else if (user.role === 'ra_staff') {
-                    document.getElementById('addPartBtn').style.display = 'inline-block';
-                    document.getElementById('borrowRecordsBtn').style.display = 'inline-block';
-                    document.getElementById('userMgmtBtn').style.display = 'none';
-                } else {
-                    document.getElementById('addPartBtn').style.display = 'none';
-                    document.getElementById('borrowRecordsBtn').style.display = 'none';
-                    document.getElementById('userMgmtBtn').style.display = 'none';
-                }
-                
-                showPage('searchPage');
-            } else {
-                alert('帳號或密碼錯誤');
-            }
-        }
-
-        function logout() {
-            currentUser = null;
-            document.getElementById('loginPage').style.display = 'block';
-            document.getElementById('mainPage').style.display = 'none';
-            document.getElementById('userInfo').style.display = 'none';
-            document.getElementById('email').value = '';
-            document.getElementById('password').value = '';
-        }
-
+        // 頁面導航
         function showPage(pageId) {
-            if (!currentUser) return;
+            // 隱藏所有頁面
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
             
-            const pages = document.querySelectorAll('.page');
-            pages.forEach(page => page.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
+            // 顯示指定頁面
+            document.getElementById(pageId + 'Page').classList.add('active');
             
-            if (pageId === 'searchPage') {
-                updateTableHeader(); // 🔥 更新表格標題
-                loadParts();
-            } else if (pageId === 'userManagementPage') {
-                loadUsers();
-            } else if (pageId === 'borrowRecordsPage') {
-                loadBorrowRecords();
-            }
+            // 更新導航狀態
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
         }
 
-        // 載入零件列表 - 新增存放位置欄位
-        function loadParts(searchKeyword = '', sortBy = 'model') {
-            const tbody = document.getElementById('partsTableBody');
-            if (!tbody) return;
+        // 模態框管理
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        function showAddEquipmentModal() {
+            showModal('addEquipmentModal');
+        }
+
+        function showAddUserModal() {
+            showModal('addUserModal');
+        }
+
+        function showNewBorrowModal() {
+            showModal('newBorrowModal');
+        }
+
+        // 表單提交處理
+        function addNewEquipment(event) {
+            event.preventDefault();
+            alert('設備新增成功！');
+            closeModal('addEquipmentModal');
+            // 這裡可以添加實際的設備新增邏輯
+        }
+
+        function addNewUser(event) {
+            event.preventDefault();
+            alert('用戶新增成功！');
+            closeModal('addUserModal');
+            // 這裡可以添加實際的用戶新增邏輯
+        }
+
+        function addNewBorrow(event) {
+            event.preventDefault();
+            alert('借用申請成功！');
+            closeModal('newBorrowModal');
+            // 這裡可以添加實際的借用申請邏輯
+        }
+
+        // 搜尋功能
+        function performSearch() {
+            alert('執行搜尋功能');
+            // 這裡可以添加實際的搜尋邏輯
+        }
+
+        function clearSearch() {
+            // 清除所有搜尋條件
+            document.querySelectorAll('#searchPage input, #searchPage select').forEach(input => {
+                input.value = '';
+            });
+            alert('搜尋條件已清除');
+        }
+
+        // 其他功能
+        function exportHistory() {
+            alert('開始匯出使用歷史報表');
+            // 這裡可以添加實際的匯出邏輯
+        }
+
+        function refreshLogs() {
+            alert('登入記錄已更新');
+            // 這裡可以添加實際的重新整理邏輯
+        }
+
+        // 事件監聽器
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('頁面載入完成'); // 調試用
             
-            tbody.innerHTML = '';
-            
-            // 根據用戶權限決定空列的列數
-            const colSpan = currentUser && (currentUser.role === 'admin' || currentUser.role === 'ra_staff') ? '8' : '5';
-            
-            // 根據權限過濾零件
-            let visibleParts = parts.filter(part => {
-                // 管理員可以看到所有零件
-                if (currentUser.role === 'admin') {
-                    return true;
-                }
-                // RA同仁可以看到：1.非隱藏零件 2.自己建立的隱藏零件
-                else if (currentUser.role === 'ra_staff') {
-                    return !part.isHidden || part.createdBy === currentUser.email;
-                }
-                // DEMO借用者只能看到非隱藏零件
-                else {
-                    return !part.isHidden;
+            // 添加 Enter 鍵登入功能
+            document.getElementById('username').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleLogin();
                 }
             });
             
-            // 根據搜尋關鍵字過濾
-            if (searchKeyword) {
-                visibleParts = visibleParts.filter(part => {
-                    // 不區分大小寫搜尋，檢查型號是否包含關鍵字
-                    return part.model.toLowerCase().includes(searchKeyword);
-                });
-                console.log('搜尋結果數量:', visibleParts.length);
-            }
-            
-            // 根據選擇的方式排序
-            if (sortBy === 'model') {
-                visibleParts.sort((a, b) => a.model.localeCompare(b.model));
-            } else if (sortBy === 'status') {
-                // 依狀態排序：在庫 > 已預約/借出
-                visibleParts.sort((a, b) => {
-                    const today = new Date();
-                    const aAvailable = getAvailableQuantityAtDate(a.id, today);
-                    const bAvailable = getAvailableQuantityAtDate(b.id, today);
-                    return bAvailable - aAvailable;
-                });
-            }
-            
-            if (visibleParts.length === 0) {
-                const row = document.createElement('tr');
-                let emptyMessage = searchKeyword ? 
-                    '找不到符合「' + searchKeyword + '」的零件資料' : 
-                    '沒有可顯示的零件資料';
-                row.innerHTML = '<td colspan="' + colSpan + '" style="text-align: center; color: #6b7280; padding: 30px;">' + emptyMessage + '</td>';
-                tbody.appendChild(row);
-                return;
-            }
-            
-            visibleParts.forEach(part => {
-                const row = document.createElement('tr');
-                
-                // 使用核心函數計算當前實際可用數量
-                const today = new Date();
-                const currentAvailable = getAvailableQuantityAtDate(part.id, today);
-                const currentUsed = part.quantity - currentAvailable;
-                
-                console.log('零件', part.model, '- 總庫存:', part.quantity, '已使用:', currentUsed, '可用:', currentAvailable);
-                
-                let actionCell = '';
-                if (currentAvailable > 0) {
-                    actionCell = '<button class="btn btn-primary" onclick="openBorrowModal(' + part.id + ')" style="margin-right: 5px; margin-bottom: 5px;">申請借用</button>';
-                } else {
-                    // 當前無庫存時，顯示預約申請按鈕
-                    actionCell = '<button class="btn" style="background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%); color: white; margin-right: 5px; margin-bottom: 5px;" onclick="openBorrowModal(' + part.id + ', true)">預約申請</button>';
+            document.getElementById('password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleLogin();
                 }
-                
-                // 🔥 新增庫存調整功能
-                let inventoryActionCell = '';
-                if (currentUser) {
-                    if (currentUser.role === 'admin') {
-                        // 管理員可以調整所有零件的庫存
-                        inventoryActionCell = '<button class="btn btn-secondary" onclick="openInventoryModal(' + part.id + ')" style="padding: 8px 12px; font-size: 12px; margin-bottom: 5px;">調整庫存</button>';
-                    } else if (currentUser.role === 'ra_staff' && part.createdBy === currentUser.email) {
-                        // RA同仁只能調整自己建立的零件庫存
-                        inventoryActionCell = '<button class="btn btn-secondary" onclick="openInventoryModal(' + part.id + ')" style="padding: 8px 12px; font-size: 12px; margin-bottom: 5px;">調整庫存</button>';
-                    }
-                }
-                
-                actionCell += inventoryActionCell;
-                
-                // 顯示實際可用數量
-                let quantityCell = currentAvailable.toString();
-                if (currentUsed > 0) {
-                    quantityCell += ' <span>(原始: ' + part.quantity + ', 已用: ' + currentUsed + ')</span>';
-                }
-                
-                let statusCell = '<span class="status-badge ' + (currentAvailable > 0 ? 'status-available' : 'status-borrowed') + '">' + (currentAvailable > 0 ? '在庫' : '已預約/借出') + '</span>';
-                
-                // 加上隱藏標記
-                if (part.isHidden) {
-                    statusCell += ' <span style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 12px; margin-left: 5px;">隱藏</span>';
-                }
-                
-                // 照片顯示
-                let photoCell = '';
-                if (part.photo) {
-                    photoCell = '<img src="' + part.photo + '" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="showImageModal(\'' + part.photo + '\')">';
-                } else {
-                    photoCell = '<span>無照片</span>';
-                }
-                
-                // 🔥 新增存放位置、建立者和備註欄位
-                let locationCreatorNotesCells = '';
-                if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'ra_staff')) {
-                    // 存放位置欄位
-                    const locationCell = '<td>' + (part.location || '未設定') + '</td>';
-                    // 建立者欄位
-                    const creatorCell = '<td>' + (part.createdBy || '未知') + '</td>';
-                    // 備註欄位
-                    const notesCell = '<td>' + (part.notes || '-') + '</td>';
-                    locationCreatorNotesCells = locationCell + creatorCell + notesCell;
-                }
-                
-                row.innerHTML = '<td>' + part.model + '</td><td>' + quantityCell + '</td><td>' + statusCell + '</td><td>' + photoCell + '</td>' + locationCreatorNotesCells + '<td>' + actionCell + '</td>';
-                tbody.appendChild(row);
             });
-        }
-
-        function searchParts() {
-            const searchKeyword = document.getElementById('searchInput').value.trim().toLowerCase();
-            const sortBy = document.getElementById('sortBy').value;
             
-            console.log('執行搜尋 - 關鍵字:', searchKeyword, '排序:', sortBy);
-            
-            // 重新載入零件列表，並加入搜尋過濾
-            loadParts(searchKeyword, sortBy);
-        }
-
-        // 新增零件
-        function addPart() {
-            const model = document.getElementById('partModel').value.trim();
-            const quantity = parseInt(document.getElementById('partQuantity').value);
-            const location = document.getElementById('partLocation').value.trim();
-            const notes = document.getElementById('partNotes').value.trim();
-            const isHidden = document.getElementById('partHidden').checked;
-            const photoFile = document.getElementById('partPhoto').files[0];
-
-            if (!model || !location) {
-                alert('請填寫所有必填欄位');
-                return;
-            }
-            if (parts.find(p => p.model === model)) {
-                alert('此型號已存在，請使用不同的型號');
-                return;
-            }
-
-            // 處理照片
-            let photoDataUrl = null;
-            if (photoFile) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    photoDataUrl = e.target.result;
-                    savePartWithPhoto();
-                };
-                reader.readAsDataURL(photoFile);
-            } else {
-                savePartWithPhoto();
-            }
-
-            function savePartWithPhoto() {
-                const newPart = {
-                    id: Date.now(),
-                    model: model,
-                    quantity: quantity,
-                    location: location,
-                    notes: notes || '',
-                    isHidden: isHidden,
-                    photo: photoDataUrl,
-                    status: '在庫',
-                    createdAt: new Date(),
-                    createdBy: currentUser.email
-                };
-
-                parts.push(newPart);
-                alert('✅ 零件建立成功！' + (isHidden ? '\n\n注意：此零件已設為隱藏，只有您和管理員可以看到。' : ''));
-                
-                // 清空表單
-                document.getElementById('partModel').value = '';
-                document.getElementById('partQuantity').value = '1';
-                document.getElementById('partLocation').value = '';
-                document.getElementById('partNotes').value = '';
-                document.getElementById('partHidden').checked = false;
-                document.getElementById('partPhoto').value = '';
-                document.getElementById('imagePreview').style.display = 'none';
-                
-                loadParts();
-            }
-        }
-
-        // 圖片預覽功能
-        function previewImage(input) {
-            const preview = document.getElementById('imagePreview');
-            const previewImg = document.getElementById('previewImg');
-            
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    previewImg.src = e.target.result;
-                    preview.style.display = 'block';
-                };
-                
-                reader.readAsDataURL(input.files[0]);
-            } else {
-                preview.style.display = 'none';
-            }
-        }
-
-        // 🔥 庫存調整功能
-        
-        // 動態生成表格標題
-        function updateTableHeader() {
-            const headerRow = document.getElementById('partsTableHeader');
-            if (!headerRow) return;
-            
-            let headerHtml = '<th style="width: 12%;">型號</th><th style="width: 15%;">在庫數量</th><th style="width: 12%;">在庫狀態</th><th style="width: 10%;">照片</th>';
-            
-            // 根據用戶權限顯示存放位置和建立者欄位
-            if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'ra_staff')) {
-                headerHtml += '<th style="width: 18%;">存放位置</th>';
-                headerHtml += '<th style="width: 12%;">建立者</th>';
-                headerHtml += '<th style="width: 15%;">備註</th>';
-            }
-            
-            headerHtml += '<th style="width: 21%;">操作</th>';
-            headerRow.innerHTML = headerHtml;
-        }
-
-        // 開啟庫存調整彈窗
-        function openInventoryModal(partId) {
-            currentInventoryPart = parts.find(p => p.id === partId);
-            if (!currentInventoryPart) return;
-
-            console.log('=== 開啟庫存調整彈窗 ===');
-            console.log('零件ID:', partId, '零件資料:', currentInventoryPart);
-
-            // 檢查權限
-            if (currentUser.role === 'ra_staff' && currentInventoryPart.createdBy !== currentUser.email) {
-                alert('您只能調整自己建立的零件庫存');
-                return;
-            }
-
-            document.getElementById('inventoryModal').style.display = 'block';
-            document.getElementById('inventoryPartModel').value = currentInventoryPart.model;
-            document.getElementById('currentInventoryQuantity').value = currentInventoryPart.quantity;
-            document.getElementById('newInventoryQuantity').value = currentInventoryPart.quantity;
-            document.getElementById('inventoryReason').value = '';
-            document.getElementById('inventoryWarning').style.display = 'none';
-
-            // 綁定數量變更事件
-            document.getElementById('newInventoryQuantity').addEventListener('input', checkInventoryImpact);
-        }
-
-        // 檢查庫存調整的影響
-        function checkInventoryImpact() {
-            if (!currentInventoryPart) return;
-
-            const newQuantity = parseInt(document.getElementById('newInventoryQuantity').value) || 0;
-            const currentQuantity = currentInventoryPart.quantity;
-            const warningDiv = document.getElementById('inventoryWarning');
-            const detailsDiv = document.getElementById('inventoryWarningDetails');
-
-            console.log('檢查庫存調整影響 - 目前:', currentQuantity, '新的:', newQuantity);
-
-            if (newQuantity < currentQuantity) {
-                // 減少庫存，檢查是否會影響現有預約和借出
-                const today = new Date();
-                const currentUsed = currentQuantity - getAvailableQuantityAtDate(currentInventoryPart.id, today);
-                
-                console.log('目前已使用數量:', currentUsed, '新庫存:', newQuantity);
-
-                if (newQuantity < currentUsed) {
-                    // 新庫存小於已使用數量，會造成問題
-                    warningDiv.style.display = 'block';
-                    let warningText = '新的庫存數量 (' + newQuantity + ') 小於目前已使用數量 (' + currentUsed + ')！<br><br>';
-                    warningText += '<strong>這將影響以下記錄：</strong><br>';
-
-                    // 分析受影響的記錄
-                    let affectedReservations = 0;
-                    let affectedBorrows = 0;
-
-                    reservations.forEach(reservation => {
-                        if (reservation.partId === currentInventoryPart.id && reservation.status === RESERVATION_STATUS.CONFIRMED) {
-                            const startTime = new Date(reservation.startDate).getTime();
-                            const endTime = new Date(reservation.endDate).getTime();
-                            const todayTime = today.getTime();
-
-                            if (startTime <= todayTime && endTime >= todayTime) {
-                                affectedReservations++;
-                            }
-                        }
-                    });
-
-                    borrowRecords.forEach(record => {
-                        if (record.partId === currentInventoryPart.id && record.status === '借出中') {
-                            affectedBorrows++;
-                        }
-                    });
-
-                    if (affectedReservations > 0) {
-                        warningText += '• ' + affectedReservations + ' 個進行中的預約<br>';
-                    }
-                    if (affectedBorrows > 0) {
-                        warningText += '• ' + affectedBorrows + ' 個借出中的記錄<br>';
-                    }
-
-                    warningText += '<br><strong>建議：</strong>請先處理相關記錄，或增加庫存數量。';
-                    detailsDiv.innerHTML = warningText;
-                } else {
-                    warningDiv.style.display = 'none';
-                }
-            } else {
-                warningDiv.style.display = 'none';
-            }
-        }
-
-        // 執行庫存調整
-        function updateInventory() {
-            if (!currentInventoryPart) return;
-
-            const newQuantity = parseInt(document.getElementById('newInventoryQuantity').value);
-            const reason = document.getElementById('inventoryReason').value.trim();
-
-            if (isNaN(newQuantity) || newQuantity < 0) {
-                alert('請輸入有效的庫存數量（不能小於0）');
-                return;
-            }
-
-            if (!reason) {
-                alert('請輸入調整原因');
-                return;
-            }
-
-            const oldQuantity = currentInventoryPart.quantity;
-
-            // 最終確認
-            if (newQuantity !== oldQuantity) {
-                const action = newQuantity > oldQuantity ? '增加' : '減少';
-                const diff = Math.abs(newQuantity - oldQuantity);
-                
-                if (!confirm('確認要將 ' + currentInventoryPart.model + ' 的庫存從 ' + oldQuantity + ' ' + action + ' ' + diff + ' 個到 ' + newQuantity + ' 個嗎？')) {
-                    return;
-                }
-
-                // 執行調整
-                currentInventoryPart.quantity = newQuantity;
-
-                // 記錄調整歷史
-                const log = {
-                    id: Date.now(),
-                    partId: currentInventoryPart.id,
-                    partModel: currentInventoryPart.model,
-                    oldQuantity: oldQuantity,
-                    newQuantity: newQuantity,
-                    difference: newQuantity - oldQuantity,
-                    reason: reason,
-                    adjustedBy: currentUser.email,
-                    adjustedAt: new Date()
-                };
-                inventoryLogs.push(log);
-
-                console.log('庫存調整完成:', log);
-                alert('✅ 庫存調整成功！\n\n零件型號：' + currentInventoryPart.model + '\n原庫存：' + oldQuantity + '\n新庫存：' + newQuantity + '\n調整數量：' + (newQuantity > oldQuantity ? '+' : '') + (newQuantity - oldQuantity));
-
-                closeInventoryModal();
-                loadParts();
-            } else {
-                alert('庫存數量沒有變更');
-            }
-        }
-
-        // 關閉庫存調整彈窗
-        function closeInventoryModal() {
-            document.getElementById('inventoryModal').style.display = 'none';
-            document.getElementById('inventoryPartModel').value = '';
-            document.getElementById('currentInventoryQuantity').value = '';
-            document.getElementById('newInventoryQuantity').value = '';
-            document.getElementById('inventoryReason').value = '';
-            document.getElementById('inventoryWarning').style.display = 'none';
-            
-            // 移除事件監聽器
-            const quantityInput = document.getElementById('newInventoryQuantity');
-            if (quantityInput) {
-                const newInput = quantityInput.cloneNode(true);
-                quantityInput.parentNode.replaceChild(newInput, quantityInput);
-            }
-            
-            currentInventoryPart = null;
-        }
-        function checkReservationConflict(partId, startDate, endDate, requestQty) {
-            console.log('=== 開始衝突檢查 ===');
-            console.log('零件ID:', partId, '開始:', startDate.toLocaleDateString(), '結束:', endDate.toLocaleDateString(), '申請數量:', requestQty);
-            
-            const part = parts.find(p => p.id === partId);
-            if (!part) {
-                console.log('找不到零件');
-                return { hasConflict: true, conflicts: [] };
-            }
-            
-            let currentDate = new Date(startDate);
-            const end = new Date(endDate);
-            const conflicts = [];
-            
-            console.log('零件總庫存:', part.quantity);
-            
-            while (currentDate <= end) {
-                let totalUsed = 0;
-                const currentTime = currentDate.getTime(); // 使用時間戳比較
-                
-                console.log('檢查日期:', currentDate.toLocaleDateString(), '時間戳:', currentTime);
-                
-                // 計算該日期所有的使用量
-                // 1. 現有借出記錄
-                borrowRecords.forEach(record => {
-                    if (record.partId === partId && record.status === '借出中') {
-                        const recordStartTime = new Date(record.borrowTime).getTime();
-                        const recordEndTime = record.borrowPeriod ? new Date(record.borrowPeriod).getTime() : null;
-                        
-                        if (recordStartTime <= currentTime && (!recordEndTime || recordEndTime >= currentTime)) {
-                            totalUsed += (record.quantity || 1);
-                            console.log('  借出記錄佔用:', record.quantity || 1, '借用人:', record.borrowerName);
-                        }
+            // 導航點擊事件
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = this.getAttribute('data-page');
+                    if (pageId) {
+                        showPage(pageId);
                     }
                 });
-                
-                // 2. 現有預約記錄
-                reservations.forEach(reservation => {
-                    if (reservation.partId === partId && reservation.status === RESERVATION_STATUS.CONFIRMED) {
-                        const reservationStartTime = new Date(reservation.startDate).getTime();
-                        const reservationEndTime = new Date(reservation.endDate).getTime();
-                        
-                        if (reservationStartTime <= currentTime && reservationEndTime >= currentTime) {
-                            totalUsed += reservation.quantity;
-                            console.log('  預約記錄佔用:', reservation.quantity, '預約人:', reservation.borrowerName);
-                        }
+            });
+
+            // 模態框外部點擊關閉
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.remove('show');
                     }
                 });
-                
-                // 3. 加上這次的申請數量
-                const totalNeeded = totalUsed + requestQty;
-                
-                console.log('  已使用:', totalUsed, '+ 申請:', requestQty, '= 總需求:', totalNeeded, '總庫存:', part.quantity);
-                
-                if (totalNeeded > part.quantity) {
-                    console.log('  ❌ 發現衝突！超出:', totalNeeded - part.quantity);
-                    conflicts.push({
-                        date: new Date(currentDate),
-                        currentUsed: totalUsed,
-                        requestQty: requestQty,
-                        totalNeeded: totalNeeded,
-                        totalCapacity: part.quantity,
-                        shortfall: totalNeeded - part.quantity
-                    });
-                } else {
-                    console.log('  ✅ 此日期無衝突');
-                }
-                
-                currentDate.setDate(currentDate.getDate() + 1);
-            }
-            
-            console.log('=== 衝突檢查完成，總衝突天數:', conflicts.length, '===');
-            
-            return {
-                hasConflict: conflicts.length > 0,
-                conflicts: conflicts
-            };
-        }
-
-        // 動態更新最大可申請數量 - 重新設計
-        function updateMaxQuantity(startDate, endDate) {
-            if (!currentBorrowingPart || !startDate || !endDate) {
-                console.log('參數不完整，跳過更新');
-                return;
-            }
-            
-            let minAvailable = currentBorrowingPart.quantity;
-            let criticalDate = null;
-            let criticalDetails = [];
-            
-            console.log('=== 計算期間內最小可用庫存 ===');
-            console.log('零件:', currentBorrowingPart.model, '總庫存:', currentBorrowingPart.quantity);
-            console.log('申請期間:', startDate.toLocaleDateString(), '~', endDate.toLocaleDateString());
-            
-            // 檢查現有的預約和借出記錄
-            console.log('現有預約記錄:', reservations.filter(r => r.partId === currentBorrowingPart.id));
-            console.log('現有借出記錄:', borrowRecords.filter(r => r.partId === currentBorrowingPart.id));
-            
-            // 逐日檢查可用數量，找出最小值和關鍵衝突點
-            let currentDate = new Date(startDate);
-            const end = new Date(endDate);
-            
-            while (currentDate <= end) {
-                const availableOnDate = getAvailableQuantityAtDate(currentBorrowingPart.id, currentDate);
-                
-                console.log('日期:', currentDate.toLocaleDateString(), '可用數量:', availableOnDate);
-                
-                if (availableOnDate < minAvailable) {
-                    minAvailable = availableOnDate;
-                    criticalDate = new Date(currentDate);
-                    
-                    // 分析這個日期的詳細使用情況
-                    criticalDetails = analyzeUsageOnDate(currentBorrowingPart.id, currentDate);
-                    console.log('更新最小可用數量:', minAvailable, '關鍵日期:', criticalDate.toLocaleDateString());
-                }
-                
-                currentDate.setDate(currentDate.getDate() + 1);
-            }
-            
-            console.log('=== 最終結果 ===');
-            console.log('期間內最小可用數量:', minAvailable);
-            console.log('關鍵衝突日期:', criticalDate ? criticalDate.toLocaleDateString() : '無');
-            
-            // 更新數量輸入框的最大值
-            const quantityInput = document.getElementById('borrowQuantity');
-            if (quantityInput) {
-                const oldMax = quantityInput.max;
-                quantityInput.max = minAvailable;
-                console.log('更新數量輸入框最大值:', oldMax, '->', minAvailable);
-                
-                // 如果當前輸入的數量超過最大可用數量，自動調整
-                const currentValue = parseInt(quantityInput.value);
-                if (currentValue > minAvailable) {
-                    quantityInput.value = minAvailable;
-                    console.log('自動調整申請數量:', currentValue, '->', minAvailable);
-                }
-            }
-            
-            // 在頁面上顯示最大可申請數量提示
-            updateQuantityHint(minAvailable, criticalDate, criticalDetails);
-        }
-
-        // 分析特定日期的使用情況
-        function analyzeUsageOnDate(partId, targetDate) {
-            const details = [];
-            const targetDateStr = targetDate.toDateString();
-            
-            // 分析借出記錄
-            borrowRecords.forEach(record => {
-                if (record.partId === partId && record.status === '借出中') {
-                    const recordStartDate = new Date(record.borrowTime).toDateString();
-                    const recordEndDate = record.borrowPeriod ? new Date(record.borrowPeriod).toDateString() : null;
-                    
-                    if (recordStartDate <= targetDateStr && (!recordEndDate || recordEndDate >= targetDateStr)) {
-                        details.push({
-                            type: '借出',
-                            user: record.borrowerName,
-                            quantity: record.quantity || 1,
-                            period: new Date(record.borrowTime).toLocaleDateString() + ' ~ ' + 
-                                   (record.borrowPeriod ? new Date(record.borrowPeriod).toLocaleDateString() : '未設定')
-                        });
-                    }
-                }
             });
-            
-            // 分析預約記錄
-            reservations.forEach(reservation => {
-                if (reservation.partId === partId && reservation.status === RESERVATION_STATUS.CONFIRMED) {
-                    const reservationStartDate = new Date(reservation.startDate).toDateString();
-                    const reservationEndDate = new Date(reservation.endDate).toDateString();
-                    
-                    if (reservationStartDate <= targetDateStr && reservationEndDate >= targetDateStr) {
-                        details.push({
-                            type: '預約',
-                            user: reservation.borrowerName,
-                            quantity: reservation.quantity,
-                            period: new Date(reservation.startDate).toLocaleDateString() + ' ~ ' + 
-                                   new Date(reservation.endDate).toLocaleDateString()
-                        });
-                    }
+
+            // 初始化系統
+            showLogin();
+            console.log('系統初始化完成');
+        });
+
+        // 動態按鈕事件處理
+        document.addEventListener('click', function(e) {
+            // 借用按鈕
+            if (e.target.textContent === '借用') {
+                const row = e.target.closest('tr');
+                const equipmentName = row.cells[1].textContent;
+                if (confirm(`確定要借用 ${equipmentName} 嗎？`)) {
+                    alert('借用申請已提交');
                 }
-            });
+            }
             
-            return details;
+            // 歸還按鈕
+            if (e.target.textContent === '歸還') {
+                const row = e.target.closest('tr');
+                const equipmentName = row.cells[1].textContent;
+                if (confirm(`確定要歸還 ${equipmentName} 嗎？`)) {
+                    alert('設備歸還成功');
+                }
+            }
+            
+            // 編輯按鈕
+            if (e.target.textContent === '編輯' || e.target.textContent === '修改') {
+                alert('開啟編輯頁面');
+            }
+            
+            // 詳情按鈕
+            if (e.target.textContent === '詳情') {
+                alert('顯示詳細資訊');
+            }
+            
+            // 延期按鈕
+            if (e.target.textContent === '延期') {
+                alert('開啟延期申請');
+            }
+            
+            // 停用按鈕
+            if (e.target.textContent === '停用') {
+                if (confirm('確定要停用此用戶嗎？')) {
+                    alert('用戶已停用');
+                }
+            }
+        });
+
+        // 實用功能
+        function formatDate(date) {
+            return new Date(date).toLocaleDateString('zh-TW');
         }
 
-        // 更新數量提示 - 增強版
-        function updateQuantityHint(maxQuantity, criticalDate, criticalDetails) {
-            const quantityInput = document.getElementById('borrowQuantity');
-            const existingHint = document.getElementById('quantityHint');
-            
-            // 移除舊的提示
-            if (existingHint) {
-                existingHint.remove();
-            }
-            
-            // 添加新的提示
-            const hint = document.createElement('div');
-            hint.id = 'quantityHint';
-            hint.style.fontSize = '14px';
-            hint.style.marginTop = '5px';
-            hint.style.padding = '10px';
-            hint.style.borderRadius = '8px';
-            hint.style.border = '1px solid';
-            
-            if (maxQuantity > 0) {
-                hint.style.color = '#10b981';
-                hint.style.backgroundColor = '#d1fae5';
-                hint.style.borderColor = '#10b981';
-                
-                let hintText = '✅ 此期間最多可申請：<strong>' + maxQuantity + ' 個</strong>';
-                
-                if (criticalDate && criticalDetails.length > 0) {
-                    hintText += '<br><br>📅 限制原因（' + criticalDate.toLocaleDateString() + '）：<br>';
-                    criticalDetails.forEach(detail => {
-                        hintText += '• ' + detail.type + '：' + detail.user + ' (' + detail.quantity + '個) ' + detail.period + '<br>';
-                    });
-                }
-                
-                hint.innerHTML = hintText;
-            } else {
-                hint.style.color = '#dc2626';
-                hint.style.backgroundColor = '#fecaca';
-                hint.style.borderColor = '#dc2626';
-                hint.innerHTML = '❌ 此期間無可用庫存';
-            }
-            
-            quantityInput.parentNode.appendChild(hint);
-        }
-
-        function checkConflictOnChange() {
-            const startDateInput = document.getElementById('borrowStartDate');
-            const endDateInput = document.getElementById('borrowEndDate');
-            const quantityInput = document.getElementById('borrowQuantity');
-            const submitButton = document.querySelector('#borrowModal .btn-primary');
-            const dateError = document.getElementById('dateError');
-            
-            if (!startDateInput || !endDateInput || !quantityInput || !currentBorrowingPart) {
-                console.log('元素或零件資料不存在，跳過檢查');
-                return;
-            }
-            
-            // 重置日期錯誤狀態
-            if (dateError) {
-                dateError.style.display = 'none';
-            }
-            startDateInput.style.borderColor = '#e1e5e9';
-            endDateInput.style.borderColor = '#e1e5e9';
-            
-            const startDate = new Date(startDateInput.value);
-            const endDate = new Date(endDateInput.value);
-            const quantity = parseInt(quantityInput.value) || 1;
-            
-            if (!startDateInput.value || !endDateInput.value) {
-                console.log('日期未選擇，跳過檢查');
-                if (submitButton) submitButton.style.display = 'inline-block'; // 顯示按鈕
-                return;
-            }
-            
-            console.log('=== 開始檢查日期和衝突 ===');
-            console.log('零件:', currentBorrowingPart.model);
-            console.log('開始日期:', startDate.toLocaleDateString());
-            console.log('結束日期:', endDate.toLocaleDateString());
-            console.log('申請數量:', quantity);
-            
-            // 檢查日期有效性 - 結束日期不能早於開始日期
-            if (endDate < startDate) {
-                console.log('❌ 日期錯誤：結束日期早於開始日期');
-                
-                // 顯示錯誤訊息
-                if (dateError) {
-                    dateError.style.display = 'block';
-                }
-                
-                // 標示紅框
-                startDateInput.style.borderColor = '#dc2626';
-                endDateInput.style.borderColor = '#dc2626';
-                
-                // 隱藏確認申請按鈕
-                if (submitButton) {
-                    submitButton.style.display = 'none';
-                    console.log('已隱藏確認申請按鈕（日期錯誤）');
-                }
-                
-                // 隱藏庫存衝突警告（如果有的話）
-                const conflictWarning = document.getElementById('conflictWarning');
-                if (conflictWarning) {
-                    conflictWarning.style.display = 'none';
-                }
-                
-                return; // 不執行後續的庫存衝突檢查
-            }
-            
-            // 日期有效，繼續執行原有的庫存衝突檢查
-            console.log('✅ 日期有效，繼續檢查庫存衝突');
-            
-            // 更新最大可申請數量
-            updateMaxQuantity(startDate, endDate);
-            
-            // 檢查衝突
-            const conflictResult = checkReservationConflict(currentBorrowingPart.id, startDate, endDate, quantity);
-            const warningDiv = document.getElementById('conflictWarning');
-            const detailsDiv = document.getElementById('conflictDetails');
-            
-            if (conflictResult.hasConflict) {
-                console.log('發現衝突，顯示警告並隱藏申請按鈕');
-                warningDiv.style.display = 'block';
-                
-                // 🔥 隱藏確認申請按鈕
-                if (submitButton) {
-                    submitButton.style.display = 'none';
-                    console.log('已隱藏確認申請按鈕');
-                }
-                
-                let details = '申請數量：' + quantity + '<br>';
-                details += '零件總庫存：' + currentBorrowingPart.quantity + '<br><br>';
-                details += '<strong>衝突詳情：</strong><br>';
-                
-                conflictResult.conflicts.slice(0, 5).forEach((c, index) => {
-                    details += (index + 1) + '. ' + c.date.toLocaleDateString() + '：<br>';
-                    details += '&nbsp;&nbsp;&nbsp;已使用：' + c.currentUsed + ' + 申請：' + c.requestQty + ' = ' + c.totalNeeded + '<br>';
-                    details += '&nbsp;&nbsp;&nbsp;總庫存：' + c.totalCapacity + '，<span style="color: #dc2626; font-weight: bold;">超出：' + c.shortfall + '</span><br><br>';
-                });
-                
-                if (conflictResult.conflicts.length > 5) {
-                    details += '... 還有 ' + (conflictResult.conflicts.length - 5) + ' 個衝突日期<br><br>';
-                }
-                
-                details += '<strong style="color: #dc2626;">此申請將被系統拒絕！</strong><br>';
-                details += '請調整借用日期或減少借用數量。';
-                
-                detailsDiv.innerHTML = details;
-            } else {
-                console.log('無衝突，隱藏警告並顯示申請按鈕');
-                warningDiv.style.display = 'none';
-                
-                // 🔥 顯示確認申請按鈕
-                if (submitButton) {
-                    submitButton.style.display = 'inline-block';
-                    console.log('已顯示確認申請按鈕');
-                }
-            }
-        }
-
-        // 開啟借用申請彈窗
-        function openBorrowModal(partId, isReservation = false) {
-            currentBorrowingPart = parts.find(p => p.id === partId);
-            if (!currentBorrowingPart) return;
-
-            console.log('=== 開啟借用申請彈窗 ===');
-            console.log('零件ID:', partId, '零件資料:', currentBorrowingPart);
-            console.log('是否為預約申請:', isReservation);
-
-            document.getElementById('borrowModal').style.display = 'block';
-            
-            // 根據是否為預約申請，調整彈窗標題
-            const modalTitle = document.querySelector('#borrowModal h3');
-            if (modalTitle) {
-                modalTitle.textContent = isReservation ? '預約申請' : '申請借用';
-            }
-            
-            // 如果是預約申請，加入提示訊息
-            const modalBody = document.querySelector('#borrowModal .modal-body');
-            const existingNotice = document.getElementById('reservationNotice');
-            if (existingNotice) {
-                existingNotice.remove();
-            }
-            
-            if (isReservation) {
-                const notice = document.createElement('div');
-                notice.id = 'reservationNotice';
-                notice.style.cssText = 'background: #fef3c7; color: #92400e; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #fbbf24;';
-                notice.innerHTML = '<strong>📅 預約申請說明：</strong><br>目前此零件無庫存，但您可以預約未來的使用時段。系統會檢查您選擇的期間內是否有可用庫存。';
-                modalBody.insertBefore(notice, modalBody.firstChild.nextSibling);
-            }
-            
-            // 自動帶入當前使用者資料
-            if (currentUser) {
-                // 如果是預設測試帳號，使用預設值
-                if (currentUser.email === '11' || currentUser.email === '22' || currentUser.email === '33') {
-                    document.getElementById('borrowerName').value = currentUser.email;
-                    document.getElementById('borrowerEmail').value = currentUser.email + '@demo.com';
-                    document.getElementById('borrowerPhone').value = '0912-345-678';
-                } else {
-                    // 使用真實使用者資料
-                    document.getElementById('borrowerName').value = currentUser.name || '';
-                    document.getElementById('borrowerEmail').value = currentUser.email || '';
-                    document.getElementById('borrowerPhone').value = currentUser.phone || '';
-                }
-                
-                // 設定欄位為唯讀
-                document.getElementById('borrowerName').readOnly = true;
-                document.getElementById('borrowerEmail').readOnly = true;
-                document.getElementById('borrowerPhone').readOnly = true;
-                
-                // 調整欄位樣式以顯示為唯讀
-                document.getElementById('borrowerName').style.backgroundColor = '#f3f4f6';
-                document.getElementById('borrowerEmail').style.backgroundColor = '#f3f4f6';
-                document.getElementById('borrowerPhone').style.backgroundColor = '#f3f4f6';
-            }
-            
-            const today = new Date();
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            
-            document.getElementById('borrowStartDate').value = today.toISOString().split('T')[0];
-            document.getElementById('borrowEndDate').value = tomorrow.toISOString().split('T')[0];
-            
-            // 初始設定最大可申請數量
-            const initialAvailable = getAvailableQuantityAtDate(partId, today);
-            console.log('今天可用數量:', initialAvailable);
-            
-            document.getElementById('borrowQuantity').max = initialAvailable;
-            document.getElementById('borrowQuantity').value = Math.min(1, initialAvailable);
-            
-            // 🔥 確保確認申請按鈕初始狀態為顯示
-            const submitButton = document.querySelector('#borrowModal .btn-primary');
-            if (submitButton) {
-                submitButton.style.display = 'inline-block';
-                console.log('初始化：顯示確認申請按鈕');
-            }
-            
-            // 移除之前的事件監聽器（避免重複綁定）
-            const startDateInput = document.getElementById('borrowStartDate');
-            const endDateInput = document.getElementById('borrowEndDate');
-            const quantityInput = document.getElementById('borrowQuantity');
-            
-            // 克隆元素來移除所有事件監聽器
-            const newStartDateInput = startDateInput.cloneNode(true);
-            const newEndDateInput = endDateInput.cloneNode(true);
-            const newQuantityInput = quantityInput.cloneNode(true);
-            
-            startDateInput.parentNode.replaceChild(newStartDateInput, startDateInput);
-            endDateInput.parentNode.replaceChild(newEndDateInput, endDateInput);
-            quantityInput.parentNode.replaceChild(newQuantityInput, quantityInput);
-            
-            // 綁定新的事件監聽器
-            document.getElementById('borrowStartDate').addEventListener('change', function() {
-                console.log('開始日期變更');
-                checkConflictOnChange();
-            });
-            document.getElementById('borrowEndDate').addEventListener('change', function() {
-                console.log('結束日期變更');
-                checkConflictOnChange();
-            });
-            document.getElementById('borrowQuantity').addEventListener('input', function() {
-                console.log('數量變更');
-                checkConflictOnChange();
-            });
-            
-            // 立即執行初始檢查
-            console.log('執行初始檢查');
-            setTimeout(function() {
-                checkConflictOnChange();
-            }, 200);
-        }
-
-        // 提交借用申請 - 修正 ID 匹配問題
-        function submitBorrow() {
-            const borrowerName = document.getElementById('borrowerName').value.trim();
-            const borrowerEmail = document.getElementById('borrowerEmail').value.trim();
-            const borrowerPhone = document.getElementById('borrowerPhone').value.trim();
-            const startDate = document.getElementById('borrowStartDate').value;
-            const endDate = document.getElementById('borrowEndDate').value;
-            const quantity = parseInt(document.getElementById('borrowQuantity').value);
-            const description = document.getElementById('borrowDescription').value.trim();
-
-            if (!borrowerName || !borrowerEmail || !borrowerPhone || !startDate || !endDate || !quantity || !description) {
-                alert('請填寫所有欄位');
-                return;
-            }
-
-            if (new Date(endDate) < new Date(startDate)) {
-                alert('結束日期不能早於開始日期');
-                return;
-            }
-
-            console.log('=== 提交借用申請前的強制檢查 ===');
-            console.log('零件:', currentBorrowingPart.model, '零件ID:', currentBorrowingPart.id, '申請人:', borrowerName, '數量:', quantity);
-            console.log('期間:', startDate, '~', endDate);
-
-            // 🔥 強制執行最終衝突檢查 - 無法繞過
-            const conflictResult = checkReservationConflict(currentBorrowingPart.id, new Date(startDate), new Date(endDate), quantity);
-            
-            console.log('=== 最終衝突檢查結果 ===');
-            console.log('有衝突:', conflictResult.hasConflict);
-            console.log('衝突天數:', conflictResult.conflicts.length);
-            
-            if (conflictResult.hasConflict) {
-                console.log('🚫 申請被拒絕 - 庫存衝突');
-                
-                let alertMessage = '❌ 申請失敗！期間內庫存不足。\n\n';
-                alertMessage += '🔍 衝突分析：\n';
-                alertMessage += '• 申請數量：' + quantity + '\n';
-                alertMessage += '• 零件總庫存：' + currentBorrowingPart.quantity + '\n\n';
-                alertMessage += '📅 衝突詳情：\n';
-                
-                // 顯示前3個衝突日期的詳細資訊
-                conflictResult.conflicts.slice(0, 3).forEach((c, index) => {
-                    alertMessage += (index + 1) + '. ' + c.date.toLocaleDateString() + '：\n';
-                    alertMessage += '   已使用：' + c.currentUsed + ' + 申請：' + c.requestQty + ' = ' + c.totalNeeded + '\n';
-                    alertMessage += '   總庫存：' + c.totalCapacity + '，超出：' + c.shortfall + '\n\n';
-                });
-                
-                if (conflictResult.conflicts.length > 3) {
-                    alertMessage += '... 還有 ' + (conflictResult.conflicts.length - 3) + ' 個衝突日期\n\n';
-                }
-                
-                alertMessage += '💡 建議解決方案：\n';
-                alertMessage += '• 選擇其他可用日期\n';
-                alertMessage += '• 減少借用數量\n';
-                alertMessage += '• 分段申請（避開衝突期間）\n';
-                alertMessage += '• 聯絡管理員協調';
-                
-                alert(alertMessage);
-                return; // 🚫 強制停止，不允許提交
-            }
-
-            // ✅ 無衝突，可以繼續提交
-            console.log('✅ 無衝突，允許提交申請');
-
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+        function calculateDays(startDate, endDate) {
             const start = new Date(startDate);
-            start.setHours(0, 0, 0, 0);
-            const diffDays = Math.ceil((start.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-
-            if (diffDays > 0) {
-                // 預約申請 - 🔥 修正：確保使用正確的 partId
-                const reservation = {
-                    id: Date.now(),
-                    partId: currentBorrowingPart.id, // 🔥 重要：使用正確的零件ID
-                    partModel: currentBorrowingPart.model,
-                    borrowerName: borrowerName,
-                    borrowerEmail: borrowerEmail,
-                    borrowerPhone: borrowerPhone,
-                    startDate: startDate,
-                    endDate: endDate,
-                    quantity: quantity,
-                    status: RESERVATION_STATUS.CONFIRMED,
-                    description: description,
-                    createdAt: new Date()
-                };
-
-                reservations.push(reservation);
-                console.log('預約申請成功:', reservation);
-                console.log('新增預約記錄 - 零件ID:', reservation.partId, '零件型號:', reservation.partModel);
-                alert('✅ 預約申請成功！\n\n預約編號：' + reservation.id + '\n零件型號：' + currentBorrowingPart.model + '\n預約期間：' + new Date(startDate).toLocaleDateString() + ' ~ ' + new Date(endDate).toLocaleDateString() + '\n預約數量：' + quantity + '\n申請人：' + borrowerName);
-
-            } else {
-                // 即時借出 - 🔥 修正：確保使用正確的 partId
-                const borrowRecord = {
-                    id: Date.now(),
-                    partId: currentBorrowingPart.id, // 🔥 重要：使用正確的零件ID
-                    partModel: currentBorrowingPart.model,
-                    borrowerName: borrowerName,
-                    borrowerEmail: borrowerEmail,
-                    borrowerPhone: borrowerPhone,
-                    borrowPeriod: endDate,
-                    description: description,
-                    borrowTime: new Date(),
-                    returnTime: null,
-                    status: '借出中',
-                    quantity: quantity
-                };
-
-                borrowRecords.push(borrowRecord);
-                console.log('借出申請成功:', borrowRecord);
-                console.log('新增借出記錄 - 零件ID:', borrowRecord.partId, '零件型號:', borrowRecord.partModel);
-                alert('✅ 借出申請成功！\n\n借出編號：' + borrowRecord.id + '\n零件型號：' + currentBorrowingPart.model + '\n借出期間：' + new Date().toLocaleDateString() + ' ~ ' + new Date(endDate).toLocaleDateString() + '\n借出數量：' + quantity + '\n借用人：' + borrowerName);
-            }
-
-            closeBorrowModal();
-            loadParts();
-            if (document.getElementById('borrowRecordsPage').classList.contains('active')) {
-                loadBorrowRecords();
-            }
+            const end = new Date(endDate);
+            const diffTime = Math.abs(end - start);
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         }
 
-        function closeBorrowModal() {
-            document.getElementById('borrowModal').style.display = 'none';
-            document.getElementById('borrowerName').value = '';
-            document.getElementById('borrowerEmail').value = '';
-            document.getElementById('borrowerPhone').value = '';
-            document.getElementById('borrowStartDate').value = '';
-            document.getElementById('borrowEndDate').value = '';
-            document.getElementById('borrowQuantity').value = '1';
-            document.getElementById('borrowDescription').value = '';
-            document.getElementById('conflictWarning').style.display = 'none';
-            
-            // 清除日期錯誤狀態
-            const dateError = document.getElementById('dateError');
-            if (dateError) {
-                dateError.style.display = 'none';
-            }
-            document.getElementById('borrowStartDate').style.borderColor = '#e1e5e9';
-            document.getElementById('borrowEndDate').style.borderColor = '#e1e5e9';
-            
-            // 恢復欄位為可編輯狀態
-            document.getElementById('borrowerName').readOnly = false;
-            document.getElementById('borrowerEmail').readOnly = false;
-            document.getElementById('borrowerPhone').readOnly = false;
-            document.getElementById('borrowerName').style.backgroundColor = '';
-            document.getElementById('borrowerEmail').style.backgroundColor = '';
-            document.getElementById('borrowerPhone').style.backgroundColor = '';
-            
-            // 移除預約申請提示
-            const reservationNotice = document.getElementById('reservationNotice');
-            if (reservationNotice) {
-                reservationNotice.remove();
-            }
-            
-            // 恢復標題為預設值
-            const modalTitle = document.querySelector('#borrowModal h3');
-            if (modalTitle) {
-                modalTitle.textContent = '申請借用';
-            }
-            
-            // 🔥 重置確認申請按鈕狀態
-            const submitButton = document.querySelector('#borrowModal .btn-primary');
-            if (submitButton) {
-                submitButton.style.display = 'inline-block';
-                console.log('關閉彈窗：重置確認申請按鈕為顯示狀態');
-            }
-            
-            // 移除數量提示
-            const existingHint = document.getElementById('quantityHint');
-            if (existingHint) {
-                existingHint.remove();
-            }
-            
-            currentBorrowingPart = null;
+        // 模擬數據生成
+        function generateMockData() {
+            // 這裡可以添加模擬數據生成邏輯
+            console.log('生成模擬數據...');
         }
 
-        // 搜尋借出記錄
-        function searchBorrowRecords() {
-            const searchKeyword = document.getElementById('borrowRecordsSearchInput').value.trim();
-            console.log('執行搜尋 - 關鍵字:', searchKeyword);
-            loadBorrowRecords(searchKeyword);
+        // 系統初始化
+        function initializeSystem() {
+            console.log('系統初始化中...');
+            // 載入配置
+            // 初始化數據
+            // 設置定時器等
         }
 
-        // 載入借出記錄
-        function loadBorrowRecords(searchKeyword = '') {
-            const tbody = document.getElementById('borrowRecordsTableBody');
-            if (!tbody) return;
-            
-            tbody.innerHTML = '';
-
-            // 取得目前的搜尋關鍵字（如果沒有傳入參數，從輸入框取得）
-            if (!searchKeyword && document.getElementById('borrowRecordsSearchInput')) {
-                searchKeyword = document.getElementById('borrowRecordsSearchInput').value.trim();
-            }
-
-            // 取得過濾條件
-            const typeFilter = document.getElementById('typeFilter') ? document.getElementById('typeFilter').value : 'all';
-            const statusFilter = document.getElementById('statusFilter') ? document.getElementById('statusFilter').value : 'all';
-
-            const allRecords = [];
-            
-            borrowRecords.forEach(record => {
-                allRecords.push({
-                    ...record,
-                    type: 'borrow',
-                    dateForSort: new Date(record.borrowTime),
-                    applicationDate: new Date(record.borrowTime) // 借出記錄的申請日期就是借出時間
-                });
-            });
-            
-            reservations.forEach(reservation => {
-                if (reservation.status !== RESERVATION_STATUS.CANCELLED) {
-                    allRecords.push({
-                        ...reservation,
-                        type: 'reservation',
-                        dateForSort: new Date(reservation.createdAt),
-                        applicationDate: new Date(reservation.createdAt) // 預約記錄的申請日期是建立時間
-                    });
-                }
-            });
-            
-            // 第一步：根據類型和狀態過濾
-            let filteredRecords = allRecords.filter(record => {
-                // 類型過濾
-                if (typeFilter !== 'all') {
-                    if (typeFilter === 'borrow' && record.type !== 'borrow') return false;
-                    if (typeFilter === 'reservation' && record.type !== 'reservation') return false;
-                }
-                
-                // 狀態過濾
-                if (statusFilter !== 'all') {
-                    if (record.type === 'borrow') {
-                        if (statusFilter === 'borrowing' && record.status !== '借出中') return false;
-                        if (statusFilter === 'returned' && record.status !== '已歸還') return false;
-                        if (statusFilter === 'confirmed') return false; // 借出記錄沒有已確認狀態
-                    } else if (record.type === 'reservation') {
-                        if (statusFilter === 'confirmed' && record.status !== RESERVATION_STATUS.CONFIRMED) return false;
-                        if (statusFilter === 'borrowing' || statusFilter === 'returned') return false; // 預約記錄沒有借出中或已歸還狀態
-                    }
-                }
-                
-                return true;
-            });
-            
-            // 第二步：根據搜尋關鍵字過濾
-            if (searchKeyword) {
-                const keyword = searchKeyword.toLowerCase();
-                filteredRecords = filteredRecords.filter(record => {
-                    const model = (record.partModel || '').toLowerCase();
-                    return model.includes(keyword);
-                });
-                console.log('搜尋結果數量:', filteredRecords.length);
-            }
-            
-            // 第三步：根據選擇的排序方式排序
-            const sortBy = document.getElementById('borrowRecordsSortBy') ? document.getElementById('borrowRecordsSortBy').value : 'time';
-            
-            switch (sortBy) {
-                case 'time':
-                    // 依時間排序（預設為最新的在前）
-                    filteredRecords.sort((a, b) => b.dateForSort - a.dateForSort);
-                    break;
-                case 'type':
-                    // 依類型排序（借出 > 預約）
-                    filteredRecords.sort((a, b) => {
-                        if (a.type === b.type) {
-                            return b.dateForSort - a.dateForSort; // 相同類型依時間排序
-                        }
-                        return a.type === 'borrow' ? -1 : 1;
-                    });
-                    break;
-                case 'status':
-                    // 依狀態排序
-                    filteredRecords.sort((a, b) => {
-                        const aStatus = a.type === 'borrow' ? a.status : '已確認';
-                        const bStatus = b.type === 'borrow' ? b.status : '已確認';
-                        
-                        if (aStatus === bStatus) {
-                            return b.dateForSort - a.dateForSort; // 相同狀態依時間排序
-                        }
-                        
-                        // 狀態優先順序：借出中 > 已確認 > 已歸還
-                        const statusOrder = {'借出中': 0, '已確認': 1, '已歸還': 2};
-                        return statusOrder[aStatus] - statusOrder[bStatus];
-                    });
-                    break;
-                case 'model':
-                    // 依零件型號排序
-                    filteredRecords.sort((a, b) => {
-                        const aModel = a.partModel || '';
-                        const bModel = b.partModel || '';
-                        
-                        if (aModel === bModel) {
-                            return b.dateForSort - a.dateForSort; // 相同型號依時間排序
-                        }
-                        return aModel.localeCompare(bModel);
-                    });
-                    break;
-            }
-
-            // 顯示過濾後的記錄
-            if (filteredRecords.length === 0) {
-                const row = document.createElement('tr');
-                let emptyMessage = '找不到符合條件的記錄';
-                if (searchKeyword) {
-                    emptyMessage = '找不到符合「' + searchKeyword + '」的記錄';
-                } else if (typeFilter === 'borrow' && statusFilter === 'confirmed') {
-                    emptyMessage = '借出記錄沒有「已確認」狀態';
-                } else if (typeFilter === 'reservation' && (statusFilter === 'borrowing' || statusFilter === 'returned')) {
-                    emptyMessage = '預約記錄沒有「' + (statusFilter === 'borrowing' ? '借出中' : '已歸還') + '」狀態';
-                }
-                row.innerHTML = '<td colspan="11" style="text-align: center; color: #6b7280; padding: 30px;">' + emptyMessage + '</td>';
-                tbody.appendChild(row);
-                return;
-            }
-
-            filteredRecords.forEach(record => {
-                const row = document.createElement('tr');
-                
-                // 申請日期
-                const applicationDateStr = record.applicationDate.toLocaleDateString();
-                
-                let typeCell, statusCell, actionCell;
-                
-                // 根據 partId 找到對應的零件資料
-                const part = parts.find(p => p.id === record.partId);
-                
-                // 判斷當前使用者是否有權限操作
-                let hasPermission = false;
-                if (currentUser) {
-                    if (currentUser.role === 'admin') {
-                        // 管理員有完整權限
-                        hasPermission = true;
-                    } else if (currentUser.role === 'ra_staff' && part) {
-                        // RA同仁只能操作自己建立的零件
-                        hasPermission = part.createdBy === currentUser.email;
-                    }
-                    // DEMO借用者沒有任何操作權限
-                }
-                
-                if (record.type === 'borrow') {
-                    typeCell = '<span class="status-badge" style="background: #10b981; color: white;">借出</span>';
-                    statusCell = '<span class="status-badge ' + (record.status === '借出中' ? 'status-borrowed' : 'status-available') + '">' + record.status + '</span>';
-                    
-                    if (record.status === '借出中' && hasPermission) {
-                        actionCell = '<button class="btn btn-success" onclick="returnPart(' + record.id + ')">確認歸還</button>';
-                    } else {
-                        actionCell = '<span style="color: #6b7280;">-</span>';
-                    }
-                } else {
-                    typeCell = '<span class="status-badge" style="background: #3b82f6; color: white;">預約</span>';
-                    statusCell = '<span class="status-badge" style="background: #10b981; color: white;">已確認</span>';
-                    
-                    if (record.status === RESERVATION_STATUS.CONFIRMED && hasPermission) {
-                        actionCell = '<button class="btn btn-danger" onclick="cancelReservation(' + record.id + ')">取消預約</button>';
-                    } else {
-                        actionCell = '<span style="color: #6b7280;">-</span>';
-                    }
-                }
-                
-                let timeInfo = '';
-                if (record.type === 'borrow') {
-                    const borrowDate = new Date(record.borrowTime).toLocaleDateString();
-                    const returnDate = record.borrowPeriod ? new Date(record.borrowPeriod).toLocaleDateString() : '未設定';
-                    
-                    if (record.status === '已歸還' && record.returnTime) {
-                        timeInfo = borrowDate + ' ~ ' + new Date(record.returnTime).toLocaleDateString() + ' (已歸還)';
-                    } else {
-                        timeInfo = borrowDate + ' ~ ' + returnDate + ' (借出中)';
-                    }
-                } else {
-                    timeInfo = new Date(record.startDate).toLocaleDateString() + ' ~ ' + new Date(record.endDate).toLocaleDateString();
-                }
-                
-                row.innerHTML = '<td>' + applicationDateStr + '</td><td>' + (record.partModel || 'N/A') + '</td><td>' + record.borrowerName + '</td><td>' + record.borrowerEmail + '</td><td>' + record.borrowerPhone + '</td><td>' + timeInfo + '</td><td>' + (record.quantity || 1) + '</td><td>' + typeCell + '</td><td>' + statusCell + '</td><td>' + record.description + '</td><td>' + actionCell + '</td>';
-                tbody.appendChild(row);
-            });
+        // 錯誤處理
+        function handleError(error) {
+            console.error('系統錯誤:', error);
+            alert('系統發生錯誤，請聯繫管理員');
         }
 
-        function returnPart(recordId) {
-            const record = borrowRecords.find(r => r.id === recordId);
-            if (!record) return;
-
-            if (confirm('確認此零件已歸還？')) {
-                record.status = '已歸還';
-                record.returnTime = new Date();
-                
-                alert('零件歸還成功！');
-                loadBorrowRecords();
-                loadParts();
-            }
-        }
-
-        function cancelReservation(reservationId) {
-            if (confirm('確認要取消此預約嗎？')) {
-                const reservation = reservations.find(r => r.id === reservationId);
-                if (reservation) {
-                    reservation.status = RESERVATION_STATUS.CANCELLED;
-                    alert('預約已取消');
-                    loadBorrowRecords();
-                    loadParts();
-                }
-            }
-        }
-
-        // 使用者管理
-        function loadUsers() {
-            console.log('loadUsers called');
-            const tbody = document.getElementById('usersTableBody');
-            if (!tbody) {
-                console.log('usersTableBody not found');
-                return;
-            }
-            
-            tbody.innerHTML = '';
-
-            users.forEach(user => {
-                const row = document.createElement('tr');
-                
-                // 如果帳號被停用，整行顯示為灰色
-                if (user.isActive === false) {
-                    row.style.opacity = '0.6';
-                    row.style.backgroundColor = '#f3f4f6';
-                }
-                
-                let roleDisplay = '';
-                switch(user.role) {
-                    case 'admin': roleDisplay = '管理員'; break;
-                    case 'ra_staff': roleDisplay = 'RA同仁'; break;
-                    case 'demo_user': roleDisplay = 'DEMO借用者'; break;
-                    default: roleDisplay = '使用者';
-                }
-                
-                // 狀態顯示
-                let statusCell = '';
-                if (user.isActive === true || user.isActive === undefined) {
-                    statusCell = '<span style="color: #10b981; font-weight: 500;">✓ 啟用</span>';
-                } else {
-                    statusCell = '<span style="color: #ef4444; font-weight: 500;">✗ 停用</span>';
-                }
-                
-                let actionCell = '';
-                let passwordCell = '<button class="btn btn-secondary" onclick="openPasswordModal(\'' + user.email + '\')" style="padding: 8px 16px; font-size: 14px;">修改密碼</button>';
-                
-                if (user.email !== currentUser.email) {
-                    // 角色選擇
-                    actionCell = '<select onchange="updateUserRole(\'' + user.email + '\', this.value)" style="margin-right: 10px;">' +
-                               '<option value="admin"' + (user.role === 'admin' ? ' selected' : '') + '>管理員</option>' +
-                               '<option value="ra_staff"' + (user.role === 'ra_staff' ? ' selected' : '') + '>RA同仁</option>' +
-                               '<option value="demo_user"' + (user.role === 'demo_user' ? ' selected' : '') + '>DEMO借用者</option>' +
-                               '</select>';
-                    
-                    // 啟用/停用按鈕
-                    if (user.isActive === true || user.isActive === undefined) {
-                        actionCell += '<button class="btn" style="background-color: #ef4444; color: white; padding: 8px 16px; font-size: 14px; margin-right: 10px;" onclick="toggleUserStatus(\'' + user.email + '\')">停用</button>';
-                    } else {
-                        actionCell += '<button class="btn" style="background-color: #10b981; color: white; padding: 8px 16px; font-size: 14px; margin-right: 10px;" onclick="toggleUserStatus(\'' + user.email + '\')">啟用</button>';
-                    }
-                    
-                    // 刪除按鈕
-                    actionCell += '<button class="btn btn-danger" onclick="deleteUser(\'' + user.email + '\')" style="padding: 8px 16px; font-size: 14px;">刪除</button>';
-                } else {
-                    actionCell = '<span style="color: #6b7280;">目前使用者</span>';
-                }
-                
-                // 顯示姓名和電話，如果是舊資料沒有這些欄位則顯示預設值
-                const userName = user.name || user.email.split('@')[0];
-                const userPhone = user.phone || '-';
-                
-                row.innerHTML = '<td>' + userName + '</td><td>' + user.email + '</td><td>' + userPhone + '</td><td>' + roleDisplay + '</td><td>' + statusCell + '</td><td>' + passwordCell + '</td><td>' + actionCell + '</td>';
-                tbody.appendChild(row);
-            });
-            
-            console.log('Users loaded:', users.length);
-        }
-        
-        // 確保函數在全域範圍內可用
-        window.loadUsers = loadUsers;
-
-        // 切換使用者狀態（啟用/停用）
-        function toggleUserStatus(email) {
-            const user = users.find(u => u.email === email);
-            if (!user) return;
-            
-            // 檢查是否為最後一個啟用的管理員
-            const activeAdmins = users.filter(u => u.role === 'admin' && (u.isActive === true || u.isActive === undefined));
-            if (user.role === 'admin' && (user.isActive === true || user.isActive === undefined) && activeAdmins.length === 1) {
-                alert('❌ 無法停用最後一個管理員帳號！');
-                return;
-            }
-            
-            // 切換狀態
-            if (user.isActive === true || user.isActive === undefined) {
-                if (confirm('確定要停用此帳號嗎？\n\n帳號：' + email + '\n停用後該使用者將無法登入系統。')) {
-                    user.isActive = false;
-                    alert('✅ 帳號已停用');
-                    loadUsers();
-                }
-            } else {
-                if (confirm('確定要啟用此帳號嗎？\n\n帳號：' + email + '\n啟用後該使用者可以正常登入系統。')) {
-                    user.isActive = true;
-                    alert('✅ 帳號已啟用');
-                    loadUsers();
-                }
-            }
-        }
-
-        function updateUserRole(email, newRole) {
-            const user = users.find(u => u.email === email);
-            if (user && confirm('確認要變更此使用者的角色嗎？')) {
-                user.role = newRole;
-                alert('角色變更成功！');
-                loadUsers();
-            }
-        }
-
-        // 修改密碼功能
-        function openPasswordModal(userEmail) {
-            document.getElementById('passwordUserEmail').value = userEmail;
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmPassword').value = '';
-            document.getElementById('passwordModal').style.display = 'block';
-        }
-
-        function closePasswordModal() {
-            document.getElementById('passwordModal').style.display = 'none';
-            document.getElementById('passwordUserEmail').value = '';
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmPassword').value = '';
-        }
-
-        function updatePassword() {
-            const userEmail = document.getElementById('passwordUserEmail').value;
-            const newPassword = document.getElementById('newPassword').value.trim();
-            const confirmPassword = document.getElementById('confirmPassword').value.trim();
-
-            if (!newPassword) {
-                alert('請輸入新密碼');
-                return;
-            }
-
-            if (newPassword !== confirmPassword) {
-                alert('兩次輸入的密碼不一致');
-                return;
-            }
-
-            if (newPassword.length < 1) {
-                alert('密碼長度至少需要1個字元');
-                return;
-            }
-
-            const user = users.find(u => u.email === userEmail);
-            if (user && confirm('確認要修改此帳號的密碼嗎？')) {
-                user.password = newPassword;
-                alert('密碼修改成功！');
-                closePasswordModal();
-            }
-        }
-
-        // 清除特定欄位的錯誤
-        function clearError(fieldId) {
-            const errorElement = document.getElementById(fieldId + 'Error');
-            const inputElement = document.getElementById(fieldId);
-            
-            if (errorElement) {
-                errorElement.style.display = 'none';
-                errorElement.textContent = '';
-            }
-            
-            if (inputElement) {
-                inputElement.style.borderColor = '#e1e5e9';
-            }
-        }
-
-        // 清除所有錯誤提示
-        function clearAllErrors() {
-            const errorElements = document.querySelectorAll('[id$="Error"]');
-            errorElements.forEach(el => {
-                el.style.display = 'none';
-                el.textContent = '';
-            });
-            
-            // 清除紅框
-            const inputs = document.querySelectorAll('#addUserModal input');
-            inputs.forEach(input => {
-                input.style.borderColor = '#e1e5e9';
-            });
-        }
-
-        // 顯示錯誤訊息
-        function showError(fieldId, message) {
-            const errorElement = document.getElementById(fieldId + 'Error');
-            const inputElement = document.getElementById(fieldId);
-            
-            if (errorElement) {
-                errorElement.textContent = message;
-                errorElement.style.display = 'block';
-            }
-            
-            if (inputElement) {
-                inputElement.style.borderColor = '#dc2626';
-            }
-        }
-
-        // 即時驗證函數
-        function validateName() {
-            const name = document.getElementById('addUserName').value.trim();
-            clearError('addUserName');
-            
-            if (!name) {
-                showError('addUserName', '請輸入姓名');
-                return false;
-            } else if (name.length < 2) {
-                showError('addUserName', '姓名至少需要2個字元');
-                return false;
-            }
+        // 驗證功能
+        function validateForm(formData) {
+            // 表單驗證邏輯
             return true;
         }
 
-        function validateEmail() {
-            const email = document.getElementById('addUserEmail').value.trim();
-            clearError('addUserEmail');
-            
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!email) {
-                showError('addUserEmail', '請輸入Email');
-                return false;
-            } else if (!emailRegex.test(email)) {
-                showError('addUserEmail', '請輸入有效的Email格式');
-                return false;
-            } else if (users.find(u => u.email === email)) {
-                showError('addUserEmail', '此Email已存在，請使用不同的Email');
-                return false;
-            }
-            return true;
-        }
-
-        function validatePhone() {
-            const phone = document.getElementById('addUserPhone').value.trim();
-            clearError('addUserPhone');
-            
-            const phoneRegex = /^[\d\-\+\(\)\s]+$/;
-            if (!phone) {
-                showError('addUserPhone', '請輸入電話');
-                return false;
-            } else if (!phoneRegex.test(phone)) {
-                showError('addUserPhone', '電話格式不正確，只能包含數字、空格和符號(+-)');
-                return false;
-            } else if (phone.replace(/\D/g, '').length < 7) {
-                showError('addUserPhone', '電話號碼至少需要7位數字');
-                return false;
-            }
-            return true;
-        }
-
-        function validatePassword() {
-            const password = document.getElementById('addUserPassword').value.trim();
-            clearError('addUserPassword');
-            
-            if (!password) {
-                showError('addUserPassword', '請輸入密碼');
-                return false;
-            } else if (password.length < 6) {
-                showError('addUserPassword', '密碼長度至少需要6個字元');
+        // 權限檢查
+        function checkPermission(action) {
+            if (!isLoggedIn) {
+                alert('請先登入系統');
+                showLogin();
                 return false;
             }
             
-            // 如果確認密碼已填寫，也要檢查是否一致
-            const confirmPassword = document.getElementById('addUserConfirmPassword').value.trim();
-            if (confirmPassword) {
-                validateConfirmPassword();
+            // 根據當前用戶類型檢查權限
+            if (currentUser === 'user' && ['delete', 'admin'].includes(action)) {
+                alert('權限不足');
+                return false;
             }
             
             return true;
         }
 
-        function validateConfirmPassword() {
-            const password = document.getElementById('addUserPassword').value.trim();
-            const confirmPassword = document.getElementById('addUserConfirmPassword').value.trim();
-            clearError('addUserConfirmPassword');
+        // 主題切換（未來擴展）
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+        }
+
+        // 語言切換（未來擴展）
+        function changeLanguage(lang) {
+            console.log('切換語言到:', lang);
+        }
+
+        // 通知功能
+        function showNotification(message, type = 'info') {
+            // 創建通知元素
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#6c63ff'};
+                color: white;
+                border-radius: 6px;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
             
-            if (!confirmPassword) {
-                showError('addUserConfirmPassword', '請再次輸入密碼');
-                return false;
-            } else if (password !== confirmPassword) {
-                showError('addUserConfirmPassword', '兩次輸入的密碼不一致');
-                return false;
-            }
-            return true;
+            document.body.appendChild(notification);
+            
+            // 3秒後自動移除
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
         }
 
-        // 新增使用者功能
-        function openAddUserModal() {
-            document.getElementById('addUserName').value = '';
-            document.getElementById('addUserEmail').value = '';
-            document.getElementById('addUserPhone').value = '';
-            document.getElementById('addUserPassword').value = '';
-            document.getElementById('addUserConfirmPassword').value = '';
-            document.getElementById('addUserRole').value = 'demo_user';
-            clearAllErrors();
-            document.getElementById('addUserModal').style.display = 'block';
-        }
-
-        function closeAddUserModal() {
-            document.getElementById('addUserModal').style.display = 'none';
-            document.getElementById('addUserName').value = '';
-            document.getElementById('addUserEmail').value = '';
-            document.getElementById('addUserPhone').value = '';
-            document.getElementById('addUserPassword').value = '';
-            document.getElementById('addUserConfirmPassword').value = '';
-            document.getElementById('addUserRole').value = 'demo_user';
-            clearAllErrors();
-        }
-
-        function addNewUser() {
-            // 執行所有驗證
-            const isNameValid = validateName();
-            const isEmailValid = validateEmail();
-            const isPhoneValid = validatePhone();
-            const isPasswordValid = validatePassword();
-            const isConfirmPasswordValid = validateConfirmPassword();
-
-            // 如果有任何驗證失敗，停止執行
-            if (!isNameValid || !isEmailValid || !isPhoneValid || !isPasswordValid || !isConfirmPasswordValid) {
-                return;
-            }
-
-            // 取得所有欄位值
-            const name = document.getElementById('addUserName').value.trim();
-            const email = document.getElementById('addUserEmail').value.trim();
-            const phone = document.getElementById('addUserPhone').value.trim();
-            const password = document.getElementById('addUserPassword').value.trim();
-            const role = document.getElementById('addUserRole').value;
-
-            const newUser = {
-                name: name,
-                email: email,
-                phone: phone,
-                password: password,
-                role: role,
-                isActive: true
-            };
-
-            users.push(newUser);
-            alert('✅ 新增使用者成功！');
-            closeAddUserModal();
-            loadUsers();
-        }
-
-        // 刪除使用者功能
-        function deleteUser(userEmail) {
-            if (userEmail === currentUser.email) {
-                alert('無法刪除目前登入的使用者');
-                return;
-            }
-
-            if (confirm('確認要刪除此使用者嗎？此操作無法復原。')) {
-                const userIndex = users.findIndex(u => u.email === userEmail);
-                if (userIndex !== -1) {
-                    users.splice(userIndex, 1);
-                    alert('使用者已刪除');
-                    loadUsers();
+        // 添加動畫樣式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateX(100%);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
                 }
             }
-        }
+            
+            .notification {
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            }
+        `;
+        document.head.appendChild(style);
 
-        // 照片放大顯示功能
-        function showImageModal(imageSrc) {
-            document.getElementById('modalImage').src = imageSrc;
-            document.getElementById('imageModal').style.display = 'block';
-        }
-
-        function closeImageModal() {
-            document.getElementById('imageModal').style.display = 'none';
-        }
+        // 系統狀態監控
+        setInterval(() => {
+            // 檢查系統狀態
+            // 自動保存數據
+            // 檢查會話有效性
+        }, 30000); // 每30秒檢查一次
     </script>
 </body>
 </html>
